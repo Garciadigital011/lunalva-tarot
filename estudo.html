@@ -10,9 +10,9 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#04030a;min-height:100vh;overflow-x:hidden}
+body{background:#060503;min-height:100vh;overflow-x:hidden}
 ::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-thumb{background:rgba(120,80,180,.2);border-radius:2px}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:2px}
 .gothic{font-family:'UnifrakturMaguntia',cursive}
 .cinzel{font-family:'Cinzel',serif}
 .garamond{font-family:'EB Garamond',serif}
@@ -23,7 +23,7 @@ textarea,input{font-family:'EB Garamond',serif}
 @keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes sp{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 @keyframes sh{0%,100%{opacity:.2}60%{opacity:.85}}
-@keyframes gl{0%,100%{box-shadow:0 0 8px rgba(120,80,180,.07)}50%{box-shadow:0 0 22px rgba(120,80,180,.25)}}
+@keyframes gl{0%,100%{box-shadow:0 0 15px rgba(201,168,76,.15)}50%{box-shadow:0 0 40px rgba(201,168,76,.4)}}
 @keyframes eyePulse{0%,100%{opacity:.5}50%{opacity:.9}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 </style>
@@ -36,20 +36,20 @@ const{useState,useEffect,useRef,useCallback}=React;
 // ── PALETA ESTUDO — dourado envelhecido (igual ao Arcana) ─────────
 const E={
   bg:"#060503",panel:"#0c0a06",
-  purple:"#8a7448",purpleBr:"#9e8555",purplePale:"#baa06e",
-  purpleDim:"rgba(138,116,72,0.55)",
-  deep:"#5c4828",deepDim:"rgba(92,72,40,0.40)",
-  border:"rgba(138,116,72,0.22)",borderBr:"rgba(158,133,85,0.45)",
-  text:"rgba(200,180,138,0.88)",textDim:"rgba(164,144,100,0.50)",
-  textFaint:"rgba(138,116,72,0.32)",
-  gold:"#8a7448",goldBr:"#9e8555",
+  purple:"#c9a84c",purpleBr:"#d4b85c",purplePale:"#e0c878",
+  purpleDim:"rgba(201,168,76,0.70)",
+  deep:"#7a6230",deepDim:"rgba(122,98,48,0.50)",
+  border:"rgba(201,168,76,0.30)",borderBr:"rgba(212,184,92,0.55)",
+  text:"rgba(225,205,160,0.95)",textDim:"rgba(190,170,120,0.65)",
+  textFaint:"rgba(180,150,90,0.45)",
+  gold:"#c9a84c",goldBr:"#d4b85c",
 };
 
 // ── ESTRELAS ──────────────────────────────────────────────────────
 const STARS=Array.from({length:100},(_,i)=>({x:(i*137.5)%100,y:(i*97.3)%100,s:.2+((i*31)%16)/12,d:(i*43)%6,dur:2.5+(i*17)%5}));
 function Stars(){
   return <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0}}>
-    {STARS.map((s,i)=><div key={i} style={{position:"absolute",left:`${s.x}%`,top:`${s.y}%`,width:`${s.s}px`,height:`${s.s}px`,borderRadius:"50%",background:s.s>1.2?E.purple:"rgba(220,190,130,.4)",animation:`tw ${s.dur}s ${s.d}s ease-in-out infinite alternate`}}/>)}
+    {STARS.map((s,i)=><div key={i} style={{position:"absolute",left:`${s.x}%`,top:`${s.y}%`,width:`${s.s}px`,height:`${s.s}px`,borderRadius:"50%",background:s.s>1.2?E.purple:"rgba(240,210,150,.55)",animation:`tw ${s.dur}s ${s.d}s ease-in-out infinite alternate`}}/>)}
   </div>;
 }
 
@@ -436,12 +436,12 @@ function FundamentoCard({f,onClick}){
       onMouseLeave={e=>e.currentTarget.style.borderColor=E.border}>
       <div style={{position:"absolute",top:0,left:0,bottom:0,width:2,background:`linear-gradient(180deg,transparent,${E.purple},transparent)`,opacity:.6}}/>
       <div style={{display:"flex",alignItems:"center",gap:10}}>
-        <div style={{width:36,height:36,borderRadius:"50%",border:`1px solid ${E.deepDim}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,background:"rgba(123,95,160,.08)",flexShrink:0}}>{f.icon}</div>
+        <div style={{width:36,height:36,borderRadius:"50%",border:`1px solid ${E.deepDim}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,background:"rgba(123,95,160,.08)",flexShrink:0}}>{f.icon}</div>
         <div>
-          <div className="cinzel" style={{fontSize:12,color:E.purplePale,marginBottom:2}}>{f.titulo}</div>
-          <div className="garamond" style={{fontSize:11,color:E.textDim,fontStyle:"italic"}}>{f.conteudo.slice(0,60)}…</div>
+          <div className="cinzel" style={{fontSize:15,color:E.purplePale,marginBottom:2}}>{f.titulo}</div>
+          <div className="garamond" style={{fontSize:14,color:E.textDim,fontStyle:"italic"}}>{f.conteudo.slice(0,60)}…</div>
         </div>
-        <div style={{color:E.purpleDim,fontSize:16,marginLeft:"auto",flexShrink:0}}>›</div>
+        <div style={{color:E.purpleDim,fontSize:19,marginLeft:"auto",flexShrink:0}}>›</div>
       </div>
     </div>
   );
@@ -455,14 +455,14 @@ function FundamentoDetalhe({f,onClose}){
       <div style={{maxWidth:560,margin:"0 auto"}}>
         <div style={{textAlign:"center",marginBottom:18}}>
           <div style={{fontSize:36,marginBottom:8}}>{f.icon}</div>
-          <div className="cinzel" style={{fontSize:16,color:E.purplePale,letterSpacing:2}}>{f.titulo}</div>
+          <div className="cinzel" style={{fontSize:19,color:E.purplePale,letterSpacing:2}}>{f.titulo}</div>
           <div style={{width:60,height:1,background:`linear-gradient(90deg,transparent,${E.purpleDim},transparent)`,margin:"10px auto"}}/>
         </div>
         <Panel style={{padding:"20px 18px"}}>
-          <div className="garamond" style={{color:E.text,fontSize:15,lineHeight:2.1,whiteSpace:"pre-line"}}>{f.conteudo}</div>
+          <div className="garamond" style={{color:E.text,fontSize:18,lineHeight:2.1,whiteSpace:"pre-line"}}>{f.conteudo}</div>
         </Panel>
         <div style={{textAlign:"center",marginTop:16}}>
-          <button onClick={onClose} className="cinzel" style={{background:"transparent",border:`1px solid ${E.border}`,borderRadius:8,padding:"9px 24px",color:E.textDim,fontSize:10,letterSpacing:3,cursor:"pointer"}}>VOLTAR</button>
+          <button onClick={onClose} className="cinzel" style={{background:"transparent",border:`1px solid ${E.border}`,borderRadius:8,padding:"9px 24px",color:E.textDim,fontSize:13,letterSpacing:3,cursor:"pointer"}}>VOLTAR</button>
         </div>
       </div>
     </div>
@@ -475,60 +475,60 @@ function TabFundamentos(){
   if(sel)return <FundamentoDetalhe f={sel} onClose={()=>setSel(null)}/>;
   return(
     <div style={{animation:"fu .4s ease"}}>
-      <div style={{marginBottom:20,padding:"20px 18px",borderRadius:12,background:"rgba(60,5,5,.5)",border:"1px solid rgba(200,40,40,.4)",position:"relative",overflow:"hidden"}}>
+      <div style={{marginBottom:20,padding:"20px 18px",borderRadius:12,background:"rgba(60,5,5,.5)",border:"1px solid rgba(200,40,40,.4)",position:"relative",overflow:"hidden",animation:"fl 5s ease-in-out infinite",boxShadow:"0 8px 30px rgba(200,40,40,.25)"}}>
         <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.7),transparent)"}}/>
         <div style={{textAlign:"center",marginBottom:12}}>
           <div style={{fontSize:26,marginBottom:5}}>⚠️</div>
-          <div className="cinzel" style={{fontSize:10,letterSpacing:4,color:"rgba(240,80,80,1)"}}>MATERIAL SAGRADO — SÓ PARA ESTUDO SÉRIO</div>
+          <div className="cinzel" style={{fontSize:13,letterSpacing:4,color:"rgba(240,80,80,1)"}}>MATERIAL SAGRADO — SÓ PARA ESTUDO SÉRIO</div>
         </div>
-        <div className="garamond" style={{fontSize:14,color:"rgba(220,160,160,.9)",lineHeight:2.1}}>
+        <div className="garamond" style={{fontSize:17,color:"rgba(220,160,160,.9)",lineHeight:2.1}}>
           Estudar tarot é um compromisso espiritual. Este material não foi feito para curiosidade vaga — foi feito para quem quer aprender com respeito. O tarot tem poder real. Mexe com energia. Abre portas. Quem brinca com o sagrado, a espiritualidade cobra. Não existe uso leviano do tarot sem consequência para a energia vital de quem usa e de quem é lido.
         </div>
         <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.3),transparent)",margin:"12px 0"}}/>
-        <div className="garamond" style={{fontSize:14,color:"rgba(220,160,160,.9)",lineHeight:2.1}}>
+        <div className="garamond" style={{fontSize:17,color:"rgba(220,160,160,.9)",lineHeight:2.1}}>
           Nunca use este conhecimento com pessoas em fragilidade emocional ou espiritual sem preparo. Leituras feitas sem proteção e sem equilíbrio podem atrair obsessores — energias que se aproveitam de brechas abertas pelo desequilíbrio. Estude. Prepare-se. Cuide da sua vibração antes de cuidar da do outro.
         </div>
         <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.3),transparent)",margin:"12px 0"}}/>
-        <div className="cinzel" style={{fontSize:10,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:8}}>✦ ESTE MATERIAL SÓ TEM VALOR PARA QUEM É CONSAGRADO</div>
-        <div className="garamond" style={{fontSize:14,color:"rgba(220,160,160,.9)",lineHeight:2.1}}>
+        <div className="cinzel" style={{fontSize:13,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:8}}>✦ ESTE MATERIAL SÓ TEM VALOR PARA QUEM É CONSAGRADO</div>
+        <div className="garamond" style={{fontSize:17,color:"rgba(220,160,160,.9)",lineHeight:2.1}}>
           Estudar tarot sem ter espiritualidade desenvolvida é como aprender a tocar um instrumento sem ter ouvido. Você pode decorar as notas — mas a música não vai sair. Para que o conhecimento aqui se transforme em dom real, é preciso ser consagrado, ter guias trabalhados e estar em desenvolvimento espiritual ativo. Sem consagração, este material pode ser um passatempo. Para quem tem a vibração — é um mapa sagrado.
         </div>
         <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.5),transparent)",margin:"12px 0"}}/>
-        <div className="cinzel" style={{fontSize:11,letterSpacing:2,color:"rgba(255,60,60,1)",marginBottom:8}}>🚫 JAMAIS USE PARA ENGANAR</div>
-        <div className="garamond" style={{fontSize:15,color:"rgba(240,170,170,.95)",lineHeight:2.1,fontStyle:"italic"}}>
+        <div className="cinzel" style={{fontSize:14,letterSpacing:2,color:"rgba(255,60,60,1)",marginBottom:8}}>🚫 JAMAIS USE PARA ENGANAR</div>
+        <div className="garamond" style={{fontSize:18,color:"rgba(240,170,170,.95)",lineHeight:2.1,fontStyle:"italic"}}>
           Usar o tarot para enganar, manipular, assustar ou tirar vantagem de alguém é uma das piores formas de abuso do sagrado. A espiritualidade vê tudo. O que é feito no nome do sagrado para prejudicar — cobra com juros. Nunca use este conhecimento para enganar ninguém. Jamais.
         </div>
         <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.5),transparent)",margin:"14px 0"}}/>
-        <div className="cinzel" style={{fontSize:11,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:10}}>💔 AS PESSOAS VÊM ATÉ NÓS QUANDO ESTÃO VULNERÁVEIS</div>
-        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2}}>
+        <div className="cinzel" style={{fontSize:14,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:10}}>💔 AS PESSOAS VÊM ATÉ NÓS QUANDO ESTÃO VULNERÁVEIS</div>
+        <div className="garamond" style={{fontSize:18,color:"rgba(220,160,160,.9)",lineHeight:2.2}}>
           Quem busca uma cartomante não está bem. Está com medo. Com o coração partido. Com uma dúvida que não consegue responder sozinho. Com uma esperança que está quase apagando. Eles chegam no momento mais frágil — e é exatamente por isso que a responsabilidade de quem lê é enorme.
         </div>
-        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2,marginTop:12}}>
+        <div className="garamond" style={{fontSize:18,color:"rgba(220,160,160,.9)",lineHeight:2.2,marginTop:12}}>
           As palavras têm peso. No sagrado, têm peso dobrado. O que sai da boca de quem lê cartas entra no coração de quem está ouvindo — porque essa pessoa está aberta, receptiva e esperando uma resposta. Ela acredita. Ela confia. E essa confiança é sagrada demais para ser tratada com descuido.
         </div>
         <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.3),transparent)",margin:"12px 0"}}/>
-        <div className="garamond" style={{fontSize:16,color:"rgba(250,190,190,.95)",lineHeight:2.1,fontStyle:"italic",textAlign:"center"}}>
+        <div className="garamond" style={{fontSize:19,color:"rgba(250,190,190,.95)",lineHeight:2.1,fontStyle:"italic",textAlign:"center"}}>
           Cuide das suas palavras como se fossem remédio. Porque para quem está vulnerável — elas são.
         </div>
         <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.5),transparent)",margin:"14px 0"}}/>
-        <div className="cinzel" style={{fontSize:11,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:10}}>🔥 NÃO ESTUDE POR EGO</div>
-        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2}}>
+        <div className="cinzel" style={{fontSize:14,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:10}}>🔥 NÃO ESTUDE POR EGO</div>
+        <div className="garamond" style={{fontSize:18,color:"rgba(220,160,160,.9)",lineHeight:2.2}}>
           O ego quer impressionar. Quer ser o que sabe mais. Quer o reconhecimento. Quando o sagrado vira espetáculo — ele perde a força. Se você está aqui para provar algo para alguém ou para ter poder sobre outros — esse não é seu caminho. Estude por amor ao conhecimento. Por vontade de servir. Por respeito ao sagrado.
         </div>
         <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.5),transparent)",margin:"14px 0"}}/>
-        <div className="cinzel" style={{fontSize:11,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:10}}>🛡 NÃO SE CONSAGRE SEM PROTEÇÃO E SEM SABER O QUE FAZ</div>
-        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2}}>
+        <div className="cinzel" style={{fontSize:14,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:10}}>🛡 NÃO SE CONSAGRE SEM PROTEÇÃO E SEM SABER O QUE FAZ</div>
+        <div className="garamond" style={{fontSize:18,color:"rgba(220,160,160,.9)",lineHeight:2.2}}>
           Consagração não é um ritual que se inventa sozinho. É um compromisso espiritual que exige preparo e a proteção de quem já percorreu esse caminho. Sem a proteção de quem te consagrou — quem tem autoridade espiritual para abrir esse portal com você — você está entrando em terreno perigoso sem armadura.
         </div>
-        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2,marginTop:12}}>
+        <div className="garamond" style={{fontSize:18,color:"rgba(220,160,160,.9)",lineHeight:2.2,marginTop:12}}>
           Busque quem sabe. Busque quem já foi pelo caminho. A humildade de aprender com quem chegou antes é parte da consagração. Saiba o que você está fazendo. Saiba com quem aprendeu. Saiba quem te protege.
         </div>
         <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.3),transparent)",margin:"12px 0"}}/>
-        <div className="garamond" style={{fontSize:16,color:"rgba(250,190,190,.95)",lineHeight:2.1,fontStyle:"italic",textAlign:"center"}}>
+        <div className="garamond" style={{fontSize:19,color:"rgba(250,190,190,.95)",lineHeight:2.1,fontStyle:"italic",textAlign:"center"}}>
           Sem isso — não comece.
         </div>
         </div>
-      <div className="cinzel" style={{fontSize:9,letterSpacing:4,color:E.purpleDim,marginBottom:12,textAlign:"center"}}>✦ FUNDAMENTOS — LEIA ANTES DE TUDO ✦</div>
+      <div className="cinzel" style={{fontSize:12,letterSpacing:4,color:E.purpleDim,marginBottom:12,textAlign:"center"}}>✦ FUNDAMENTOS — LEIA ANTES DE TUDO ✦</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:8}}>
         {FUNDAMENTOS.map(f=><FundamentoCard key={f.id} f={f} onClick={()=>setSel(f)}/>)}
       </div>
@@ -552,15 +552,15 @@ function TabArcanos(){
   return(
     <div style={{animation:"fu .4s ease"}}>
       <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar arcano…"
-        style={{width:"100%",background:"rgba(8,5,15,.95)",border:`1px solid ${E.border}`,borderRadius:10,padding:"11px 15px",color:E.text,fontSize:15,outline:"none",marginBottom:10}}/>
+        style={{width:"100%",background:"rgba(8,5,15,.95)",border:`1px solid ${E.border}`,borderRadius:10,padding:"11px 15px",color:E.text,fontSize:18,outline:"none",marginBottom:10}}/>
       <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:14}}>
-        {fs.map(([k,l])=><button key={k} onClick={()=>setFil(k)} className="cinzel" style={{padding:"4px 10px",borderRadius:14,border:`1px solid ${fil===k?E.purpleBr:E.border}`,background:fil===k?"rgba(123,95,160,.12)":"transparent",color:fil===k?E.purpleBr:E.textDim,fontSize:9,letterSpacing:1}}>{l}</button>)}
+        {fs.map(([k,l])=><button key={k} onClick={()=>setFil(k)} className="cinzel" style={{padding:"4px 10px",borderRadius:14,border:`1px solid ${fil===k?E.purpleBr:E.border}`,background:fil===k?"rgba(123,95,160,.12)":"transparent",color:fil===k?E.purpleBr:E.textDim,fontSize:12,letterSpacing:1}}>{l}</button>)}
       </div>
       {!q&&fil==="todos"?(
         <div style={{textAlign:"center",padding:"40px 0"}}>
           <div style={{fontSize:48,marginBottom:12,animation:"fl 3s ease-in-out infinite"}}>🌙</div>
-          <div className="cinzel" style={{fontSize:10,letterSpacing:4,color:E.purpleDim}}>78 ARCANOS PARA ESTUDAR</div>
-          <div className="garamond" style={{marginTop:6,fontSize:13,color:E.textDim,fontStyle:"italic"}}>Busque por nome ou filtre por tipo</div>
+          <div className="cinzel" style={{fontSize:13,letterSpacing:4,color:E.purpleDim}}>78 ARCANOS PARA ESTUDAR</div>
+          <div className="garamond" style={{marginTop:6,fontSize:16,color:E.textDim,fontStyle:"italic"}}>Busque por nome ou filtre por tipo</div>
         </div>
       ):(
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:6}}>
@@ -571,10 +571,10 @@ function TabArcanos(){
                 onMouseEnter={e=>e.currentTarget.style.borderColor=E.purpleBr}
                 onMouseLeave={e=>e.currentTarget.style.borderColor=E.border}>
                 <div style={{position:"absolute",top:0,left:0,bottom:0,width:2,background:`linear-gradient(180deg,transparent,${E.deep},transparent)`,opacity:.4}}/>
-                <div style={{width:32,height:32,borderRadius:7,background:`linear-gradient(135deg,${c1},${c2})`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,border:`1px solid ${E.deepDim}`,marginLeft:6,fontSize:15}}>{c.sym}</div>
+                <div style={{width:32,height:32,borderRadius:7,background:`linear-gradient(135deg,${c1},${c2})`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,border:`1px solid ${E.deepDim}`,marginLeft:6,fontSize:18}}>{c.sym}</div>
                 <div style={{flex:1}}>
-                  <div className="cinzel" style={{fontSize:11,color:E.purplePale}}>{c.name}</div>
-                  <div className="garamond" style={{fontSize:10,color:E.textDim,marginTop:1,fontStyle:"italic"}}>{c.essence?.slice(0,55)}…</div>
+                  <div className="cinzel" style={{fontSize:14,color:E.purplePale}}>{c.name}</div>
+                  <div className="garamond" style={{fontSize:13,color:E.textDim,marginTop:1,fontStyle:"italic"}}>{c.essence?.slice(0,55)}…</div>
                 </div>
                 <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
                   <div style={{width:6,height:6,borderRadius:"50%",background:c.move?E.purpleBr:E.textFaint}}/>
@@ -651,19 +651,19 @@ function DetalheEstudo({card,onClose}){
             </svg>
           ))}
           <div style={{position:"relative",zIndex:1,textAlign:"center"}}>
-            {card.num&&<div className="cinzel" style={{fontSize:9,letterSpacing:5,color:E.purpleDim,marginBottom:6}}>{card.num}</div>}
+            {card.num&&<div className="cinzel" style={{fontSize:12,letterSpacing:5,color:E.purpleDim,marginBottom:6}}>{card.num}</div>}
             <div style={{fontSize:52,marginBottom:10,filter:`drop-shadow(0 0 14px ${E.goldBr})`,animation:"fl 3.5s ease-in-out infinite"}}>{card.sym}</div>
-            <div className="cinzel" style={{fontSize:18,color:E.purplePale,letterSpacing:3,marginBottom:5,textShadow:`0 0 25px ${E.gold}`}}>{card.name}</div>
+            <div className="cinzel" style={{fontSize:22,color:E.purplePale,letterSpacing:3,marginBottom:5,textShadow:`0 0 25px ${E.gold}`}}>{card.name}</div>
             <div style={{width:55,height:1,background:`linear-gradient(90deg,transparent,${E.purpleDim},transparent)`,margin:"8px auto"}}/>
-            <div className="cinzel" style={{fontSize:9,letterSpacing:2,color:E.textDim,marginBottom:6}}>{card.el}{card.planet?` · ${card.planet}`:""}</div>
+            <div className="cinzel" style={{fontSize:12,letterSpacing:2,color:E.textDim,marginBottom:6}}>{card.el}{card.planet?` · ${card.planet}`:""}</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center"}}>
               <div style={{display:"inline-flex",alignItems:"center",gap:5,padding:"3px 12px",borderRadius:10,border:`1px solid ${E.deepDim}`,background:"rgba(0,0,0,.45)"}}>
                 <div style={{width:6,height:6,borderRadius:"50%",background:card.move?E.goldBr:E.textFaint}}/>
-                <span className="cinzel" style={{fontSize:8,letterSpacing:2,color:card.move?E.purpleDim:E.textFaint}}>{card.ml||"—"}</span>
+                <span className="cinzel" style={{fontSize:11,letterSpacing:2,color:card.move?E.purpleDim:E.textFaint}}>{card.ml||"—"}</span>
               </div>
               {card.el&&<div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:10,border:`1px solid ${E.deepDim}`,background:"rgba(0,0,0,.35)"}}>
-                <span style={{fontSize:11}}>{card.el==="Fogo"?"🜂":card.el==="Água"?"🜄":card.el==="Ar"?"🜁":"🜃"}</span>
-                <span className="cinzel" style={{fontSize:8,letterSpacing:1,color:E.textDim}}>{card.el}</span>
+                <span style={{fontSize:14}}>{card.el==="Fogo"?"🜂":card.el==="Água"?"🜄":card.el==="Ar"?"🜁":"🜃"}</span>
+                <span className="cinzel" style={{fontSize:11,letterSpacing:1,color:E.textDim}}>{card.el}</span>
               </div>}
             </div>
           </div>
@@ -672,7 +672,7 @@ function DetalheEstudo({card,onClose}){
         {/* Abas */}
         <div style={{display:"flex",gap:0,marginTop:10,borderRadius:8,overflow:"hidden",border:`1px solid ${E.border}`}}>
           {[["info","📖 Estudo"],["intuicao","👁 Intuição"]].map(([k,l])=>(
-            <button key={k} onClick={()=>setAba(k)} className="cinzel" style={{flex:1,padding:"9px 4px",border:"none",background:aba===k?"rgba(123,95,160,.15)":"transparent",color:aba===k?E.purplePale:E.textDim,fontSize:10,letterSpacing:1,borderBottom:aba===k?`2px solid ${E.purpleBr}`:"2px solid transparent"}}>
+            <button key={k} onClick={()=>setAba(k)} className="cinzel" style={{flex:1,padding:"9px 4px",border:"none",background:aba===k?"rgba(123,95,160,.15)":"transparent",color:aba===k?E.purplePale:E.textDim,fontSize:13,letterSpacing:1,borderBottom:aba===k?`2px solid ${E.purpleBr}`:"2px solid transparent"}}>
               {l}
             </button>
           ))}
@@ -682,44 +682,44 @@ function DetalheEstudo({card,onClose}){
           <div style={{marginTop:10}}>
             {/* Essência */}
             <Panel style={{padding:"14px 16px"}}>
-              <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:7}}>ESSÊNCIA</div>
-              <p className="garamond" style={{color:E.text,fontSize:14,fontStyle:"italic",lineHeight:1.9}}>{card.essence}</p>
+              <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleDim,marginBottom:7}}>ESSÊNCIA</div>
+              <p className="garamond" style={{color:E.text,fontSize:17,fontStyle:"italic",lineHeight:1.9}}>{card.essence}</p>
               <div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:4}}>
-                {card.kw?.split("·").map((k,i)=><span key={i} className="cinzel" style={{padding:"2px 7px",borderRadius:10,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`,fontSize:8,color:E.purpleDim,letterSpacing:1}}>{k.trim()}</span>)}
+                {card.kw?.split("·").map((k,i)=><span key={i} className="cinzel" style={{padding:"2px 7px",borderRadius:10,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`,fontSize:11,color:E.purpleDim,letterSpacing:1}}>{k.trim()}</span>)}
               </div>
             </Panel>
 
             {/* Atributos */}
             <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(8,5,15,.95)"}}>
-              <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:12}}>ATRIBUTOS SAGRADOS</div>
+              <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleDim,marginBottom:12}}>ATRIBUTOS SAGRADOS</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
                 <div style={{padding:"10px 11px",borderRadius:8,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`}}>
-                  <div className="cinzel" style={{fontSize:7,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>ELEMENTO</div>
-                  <div style={{fontSize:16,marginBottom:2}}>{card.el==="Fogo"?"🜂":card.el==="Água"?"🜄":card.el==="Ar"?"🜁":"🜃"}</div>
-                  <div className="cinzel" style={{fontSize:10,color:E.purple,marginBottom:2}}>{card.el}</div>
-                  <div className="garamond" style={{fontSize:10,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>{card.el==="Fogo"?"Ação, paixão, criação":card.el==="Água"?"Emoção, intuição, amor":card.el==="Ar"?"Mente, comunicação":"Matéria, dinheiro, corpo"}</div>
+                  <div className="cinzel" style={{fontSize:10,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>ELEMENTO</div>
+                  <div style={{fontSize:19,marginBottom:2}}>{card.el==="Fogo"?"🜂":card.el==="Água"?"🜄":card.el==="Ar"?"🜁":"🜃"}</div>
+                  <div className="cinzel" style={{fontSize:13,color:E.purple,marginBottom:2}}>{card.el}</div>
+                  <div className="garamond" style={{fontSize:13,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>{card.el==="Fogo"?"Ação, paixão, criação":card.el==="Água"?"Emoção, intuição, amor":card.el==="Ar"?"Mente, comunicação":"Matéria, dinheiro, corpo"}</div>
                 </div>
                 <div style={{padding:"10px 11px",borderRadius:8,background:card.move?"rgba(123,95,160,.1)":"rgba(20,15,30,.5)",border:`1px solid ${card.move?E.purpleBr:E.textFaint}`}}>
-                  <div className="cinzel" style={{fontSize:7,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>ENERGIA</div>
-                  <div style={{fontSize:16,marginBottom:2}}>{card.move?"⚡":"◉"}</div>
-                  <div className="cinzel" style={{fontSize:10,color:card.move?E.purple:E.textDim,marginBottom:2}}>{card.move?"MOVIMENTO":"ESTASE"}</div>
-                  <div className="garamond" style={{fontSize:10,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>{card.move?"Algo está em movimento.":"Pausa e reflexão."}</div>
+                  <div className="cinzel" style={{fontSize:10,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>ENERGIA</div>
+                  <div style={{fontSize:19,marginBottom:2}}>{card.move?"⚡":"◉"}</div>
+                  <div className="cinzel" style={{fontSize:13,color:card.move?E.purple:E.textDim,marginBottom:2}}>{card.move?"MOVIMENTO":"ESTASE"}</div>
+                  <div className="garamond" style={{fontSize:13,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>{card.move?"Algo está em movimento.":"Pausa e reflexão."}</div>
                 </div>
                 {card.type==="maior"&&card.num&&(
                   <div style={{padding:"10px 11px",borderRadius:8,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`}}>
-                    <div className="cinzel" style={{fontSize:7,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>NUMEROLOGIA</div>
-                    <div className="cinzel" style={{fontSize:16,color:E.purple,marginBottom:2}}>{card.num}</div>
-                    <div className="garamond" style={{fontSize:10,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>
+                    <div className="cinzel" style={{fontSize:10,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>NUMEROLOGIA</div>
+                    <div className="cinzel" style={{fontSize:19,color:E.purple,marginBottom:2}}>{card.num}</div>
+                    <div className="garamond" style={{fontSize:13,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>
                       {{"0":"Potencial infinito","I":"Iniciação. Força criadora","II":"Dualidade. Equilíbrio","III":"Expressão. Criatividade","IV":"Estrutura. Estabilidade","V":"Mudança. Liberdade","VI":"Harmonia. União","VII":"Movimento. Fé","VIII":"Poder. Infinito","IX":"Conclusão. Sabedoria","X":"Ciclos. Completude","XI":"Causa e efeito","XII":"Rendição. Nova visão","XIII":"Transformação","XIV":"Alquimia. Paciência","XV":"Matéria. Ilusão","XVI":"Ruptura. Revelação","XVII":"Esperança. Renovação","XVIII":"Ciclos. Intuição","XIX":"Luz. Alegria total","XX":"Despertar. Chamado","XXI":"Totalidade. Realização"}[card.num]||""}
                     </div>
                   </div>
                 )}
                 {card.planet&&(
                   <div style={{padding:"10px 11px",borderRadius:8,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`}}>
-                    <div className="cinzel" style={{fontSize:7,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>ASTRO REGENTE</div>
-                    <div style={{fontSize:16,marginBottom:2}}>✦</div>
-                    <div className="cinzel" style={{fontSize:10,color:E.purple,marginBottom:2}}>{card.planet}</div>
-                    <div className="garamond" style={{fontSize:10,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>Influência planetária</div>
+                    <div className="cinzel" style={{fontSize:10,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>ASTRO REGENTE</div>
+                    <div style={{fontSize:19,marginBottom:2}}>✦</div>
+                    <div className="cinzel" style={{fontSize:13,color:E.purple,marginBottom:2}}>{card.planet}</div>
+                    <div className="garamond" style={{fontSize:13,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>Influência planetária</div>
                   </div>
                 )}
               </div>
@@ -728,42 +728,42 @@ function DetalheEstudo({card,onClose}){
             {/* Simbolismo e Ensinamento — só maiores */}
             {card.type==="maior"&&card.simbolismo&&(
               <Panel style={{marginTop:8,padding:"14px 16px"}}>
-                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:7}}>SIMBOLISMO</div>
-                <p className="garamond" style={{color:E.text,fontSize:13,lineHeight:1.9}}>{card.simbolismo}</p>
+                <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleDim,marginBottom:7}}>SIMBOLISMO</div>
+                <p className="garamond" style={{color:E.text,fontSize:16,lineHeight:1.9}}>{card.simbolismo}</p>
               </Panel>
             )}
             {card.type==="maior"&&card.ensinamento&&(
               <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(60,40,80,.2)",borderColor:"rgba(123,95,160,.3)"}}>
-                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleBr,marginBottom:7}}>✦ ENSINAMENTO CENTRAL</div>
-                <p className="garamond" style={{color:E.purplePale,fontSize:14,fontStyle:"italic",lineHeight:1.9}}>{card.ensinamento}</p>
+                <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleBr,marginBottom:7}}>✦ ENSINAMENTO CENTRAL</div>
+                <p className="garamond" style={{color:E.purplePale,fontSize:17,fontStyle:"italic",lineHeight:1.9}}>{card.ensinamento}</p>
               </Panel>
             )}
             {card.type==="menor"&&card.ensinamento&&(
               <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(60,40,80,.2)",borderColor:"rgba(123,95,160,.3)"}}>
-                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleBr,marginBottom:7}}>✦ ENSINAMENTO DO NAIPE</div>
-                <p className="garamond" style={{color:E.purplePale,fontSize:14,fontStyle:"italic",lineHeight:1.9}}>{card.ensinamento}</p>
+                <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleBr,marginBottom:7}}>✦ ENSINAMENTO DO NAIPE</div>
+                <p className="garamond" style={{color:E.purplePale,fontSize:17,fontStyle:"italic",lineHeight:1.9}}>{card.ensinamento}</p>
               </Panel>
             )}
 
             {/* Cores */}
             {card.cores&&(
               <Panel style={{marginTop:8,padding:"14px 16px"}}>
-                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:6}}>CORES E SIMBOLISMO VISUAL</div>
-                <p className="garamond" style={{color:E.text,fontSize:13,fontStyle:"italic",lineHeight:1.8}}>{card.cores}</p>
+                <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleDim,marginBottom:6}}>CORES E SIMBOLISMO VISUAL</div>
+                <p className="garamond" style={{color:E.text,fontSize:16,fontStyle:"italic",lineHeight:1.8}}>{card.cores}</p>
               </Panel>
             )}
 
             {/* Direto e Invertido */}
             <Panel style={{marginTop:8,padding:"14px 16px"}}>
-              <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:8}}>QUANDO APARECE DIRETA</div>
-              <p className="garamond" style={{color:E.text,fontSize:13,lineHeight:1.85}}>{card.d?.g}</p>
+              <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleDim,marginBottom:8}}>QUANDO APARECE DIRETA</div>
+              <p className="garamond" style={{color:E.text,fontSize:16,lineHeight:1.85}}>{card.d?.g}</p>
             </Panel>
             <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(80,10,10,.3)",borderColor:"rgba(160,40,40,.25)"}}>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:7}}>
-                <span style={{fontSize:13,color:"rgba(200,80,80,.55)"}}>↕</span>
-                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:"rgba(200,80,80,.55)"}}>QUANDO APARECE INVERTIDA</div>
+                <span style={{fontSize:16,color:"rgba(200,80,80,.55)"}}>↕</span>
+                <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:"rgba(200,80,80,.55)"}}>QUANDO APARECE INVERTIDA</div>
               </div>
-              <p className="garamond" style={{color:"rgba(220,160,160,.72)",fontSize:13,fontStyle:"italic",lineHeight:1.85}}>{card.r?.g}</p>
+              <p className="garamond" style={{color:"rgba(220,160,160,.72)",fontSize:16,fontStyle:"italic",lineHeight:1.85}}>{card.r?.g}</p>
             </Panel>
           </div>
         )}
@@ -771,8 +771,8 @@ function DetalheEstudo({card,onClose}){
         {aba==="intuicao"&&(
           <div style={{marginTop:10}}>
             <Panel style={{padding:"13px 15px",background:"rgba(60,40,80,.15)",borderColor:"rgba(123,95,160,.3)",marginBottom:10}}>
-              <div className="cinzel" style={{fontSize:8,letterSpacing:3,color:E.purpleBr,marginBottom:6}}>👁 EXERCÍCIO DE INTUIÇÃO</div>
-              <div className="garamond" style={{fontSize:13,color:E.text,lineHeight:1.8,fontStyle:"italic"}}>
+              <div className="cinzel" style={{fontSize:11,letterSpacing:3,color:E.purpleBr,marginBottom:6}}>👁 EXERCÍCIO DE INTUIÇÃO</div>
+              <div className="garamond" style={{fontSize:16,color:E.text,lineHeight:1.8,fontStyle:"italic"}}>
                 Olhe para a carta acima. Não pense no significado que aprendeu. Apenas sinta. Responda com honestidade — não há resposta errada. A intuição é a sua ferramenta mais poderosa.
               </div>
             </Panel>
@@ -783,17 +783,17 @@ function DetalheEstudo({card,onClose}){
                   <div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=perguntaAtual?E.purpleBr:E.deepDim}}/>
                 ))}
               </div>
-              <div className="cinzel" style={{fontSize:8,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>PERGUNTA {perguntaAtual+1} DE {perguntasIntuicao.length}</div>
+              <div className="cinzel" style={{fontSize:11,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>PERGUNTA {perguntaAtual+1} DE {perguntasIntuicao.length}</div>
             </div>
 
             <Panel style={{padding:"16px 16px"}}>
-              <p className="cinzel" style={{fontSize:13,color:E.purplePale,lineHeight:1.7,marginBottom:6}}>{perguntasIntuicao[perguntaAtual].p}</p>
-              <p className="garamond" style={{fontSize:12,color:E.textDim,fontStyle:"italic",marginBottom:12}}>{perguntasIntuicao[perguntaAtual].d}</p>
+              <p className="cinzel" style={{fontSize:16,color:E.purplePale,lineHeight:1.7,marginBottom:6}}>{perguntasIntuicao[perguntaAtual].p}</p>
+              <p className="garamond" style={{fontSize:15,color:E.textDim,fontStyle:"italic",marginBottom:12}}>{perguntasIntuicao[perguntaAtual].d}</p>
               <textarea value={resp} onChange={e=>setResp(e.target.value)} placeholder="Escreva sua resposta aqui…" rows={4}
-                style={{width:"100%",background:"rgba(8,5,15,.8)",border:`1px solid ${E.deepDim}`,borderRadius:8,padding:"10px 12px",color:E.text,fontSize:14,outline:"none",resize:"vertical",lineHeight:1.7}}/>
+                style={{width:"100%",background:"rgba(8,5,15,.8)",border:`1px solid ${E.deepDim}`,borderRadius:8,padding:"10px 12px",color:E.text,fontSize:17,outline:"none",resize:"vertical",lineHeight:1.7}}/>
               <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
                 <button onClick={avaliarResposta} disabled={!resp.trim()||loadingFB} className="cinzel"
-                  style={{padding:"10px 22px",borderRadius:8,border:`1px solid ${E.purpleBr}`,background:"rgba(123,95,160,.1)",color:E.purplePale,fontSize:10,letterSpacing:2,cursor:"pointer"}}>
+                  style={{padding:"10px 22px",borderRadius:8,border:`1px solid ${E.purpleBr}`,background:"rgba(123,95,160,.1)",color:E.purplePale,fontSize:13,letterSpacing:2,cursor:"pointer"}}>
                   {loadingFB?"⟳ AVALIANDO…":"✦ RECEBER FEEDBACK DA IA"}
                 </button>
               </div>
@@ -801,17 +801,17 @@ function DetalheEstudo({card,onClose}){
 
             {feedbackIA&&(
               <Panel style={{marginTop:10,padding:"15px 16px",background:"rgba(40,30,60,.3)",borderColor:"rgba(123,95,160,.35)"}}>
-                <div className="cinzel" style={{fontSize:8,letterSpacing:3,color:E.purpleBr,marginBottom:8}}>✦ FEEDBACK</div>
-                <div className="garamond" style={{color:E.text,fontSize:14,lineHeight:2,whiteSpace:"pre-line"}}>{feedbackIA}</div>
+                <div className="cinzel" style={{fontSize:11,letterSpacing:3,color:E.purpleBr,marginBottom:8}}>✦ FEEDBACK</div>
+                <div className="garamond" style={{color:E.text,fontSize:17,lineHeight:2,whiteSpace:"pre-line"}}>{feedbackIA}</div>
                 {perguntaAtual<perguntasIntuicao.length-1&&(
                   <div style={{textAlign:"center",marginTop:12}}>
-                    <button onClick={proximaPergunta} className="cinzel" style={{padding:"9px 20px",borderRadius:8,border:`1px solid ${E.border}`,background:"transparent",color:E.textDim,fontSize:9,letterSpacing:2,cursor:"pointer"}}>PRÓXIMA PERGUNTA ›</button>
+                    <button onClick={proximaPergunta} className="cinzel" style={{padding:"9px 20px",borderRadius:8,border:`1px solid ${E.border}`,background:"transparent",color:E.textDim,fontSize:12,letterSpacing:2,cursor:"pointer"}}>PRÓXIMA PERGUNTA ›</button>
                   </div>
                 )}
                 {perguntaAtual===perguntasIntuicao.length-1&&(
                   <div style={{marginTop:12,textAlign:"center"}}>
-                    <div className="cinzel" style={{fontSize:9,color:E.purplePale,letterSpacing:2}}>✦ EXERCÍCIO CONCLUÍDO ✦</div>
-                    <div className="garamond" style={{fontSize:12,color:E.textDim,fontStyle:"italic",marginTop:4}}>Você completou o exercício intuitivo desta carta.</div>
+                    <div className="cinzel" style={{fontSize:12,color:E.purplePale,letterSpacing:2}}>✦ EXERCÍCIO CONCLUÍDO ✦</div>
+                    <div className="garamond" style={{fontSize:15,color:E.textDim,fontStyle:"italic",marginTop:4}}>Você completou o exercício intuitivo desta carta.</div>
                   </div>
                 )}
               </Panel>
@@ -820,7 +820,7 @@ function DetalheEstudo({card,onClose}){
         )}
 
         <div style={{textAlign:"center",marginTop:16}}>
-          <button onClick={onClose} className="cinzel" style={{background:"transparent",border:`1px solid ${E.border}`,borderRadius:8,padding:"9px 24px",color:E.textDim,fontSize:10,letterSpacing:3,cursor:"pointer"}}>VOLTAR</button>
+          <button onClick={onClose} className="cinzel" style={{background:"transparent",border:`1px solid ${E.border}`,borderRadius:8,padding:"9px 24px",color:E.textDim,fontSize:13,letterSpacing:3,cursor:"pointer"}}>VOLTAR</button>
         </div>
       </div>
     </div>
@@ -856,17 +856,17 @@ function App(){
 
         {/* Chave API */}
         <div style={{position:"relative",paddingTop:12}}>
-          <button onClick={()=>setShowKey(s=>!s)} style={{position:"absolute",top:12,right:0,background:"transparent",border:`1px solid ${apiKey?E.deepDim:"rgba(200,80,60,.4)"}`,borderRadius:8,padding:"4px 10px",color:apiKey?E.textFaint:"rgba(220,100,80,.8)",fontFamily:"'Cinzel',serif",fontSize:8,letterSpacing:2,cursor:"pointer"}}>
+          <button onClick={()=>setShowKey(s=>!s)} style={{position:"absolute",top:12,right:0,background:"transparent",border:`1px solid ${apiKey?E.deepDim:"rgba(200,80,60,.4)"}`,borderRadius:8,padding:"4px 10px",color:apiKey?E.textFaint:"rgba(220,100,80,.8)",fontFamily:"'Cinzel',serif",fontSize:11,letterSpacing:2,cursor:"pointer"}}>
             {apiKey?"⚙ API OK":"⚠ CONFIG API"}
           </button>
           {showKey&&(
             <div style={{background:E.panel,border:`1px solid ${E.border}`,borderRadius:10,padding:"14px 16px",marginTop:40}}>
-              <div className="cinzel" style={{fontSize:8,letterSpacing:3,color:E.purpleDim,marginBottom:8}}>CHAVE ANTHROPIC API</div>
+              <div className="cinzel" style={{fontSize:11,letterSpacing:3,color:E.purpleDim,marginBottom:8}}>CHAVE ANTHROPIC API</div>
               <div style={{display:"flex",gap:8}}>
                 <input value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder="sk-ant-..." type="password"
-                  style={{flex:1,background:"rgba(5,3,10,.9)",border:`1px solid ${E.deepDim}`,borderRadius:7,padding:"9px 12px",color:E.text,fontSize:13,outline:"none"}}/>
+                  style={{flex:1,background:"rgba(5,3,10,.9)",border:`1px solid ${E.deepDim}`,borderRadius:7,padding:"9px 12px",color:E.text,fontSize:16,outline:"none"}}/>
                 <button onClick={()=>salvarKey(apiKey)} className="cinzel"
-                  style={{background:"rgba(123,95,160,.15)",border:`1px solid ${E.purpleBr}`,borderRadius:7,padding:"9px 16px",color:E.purpleBr,fontSize:9,letterSpacing:2,cursor:"pointer"}}>SALVAR</button>
+                  style={{background:"rgba(123,95,160,.15)",border:`1px solid ${E.purpleBr}`,borderRadius:7,padding:"9px 16px",color:E.purpleBr,fontSize:12,letterSpacing:2,cursor:"pointer"}}>SALVAR</button>
               </div>
             </div>
           )}
@@ -874,27 +874,27 @@ function App(){
 
         {/* Header */}
         <div style={{textAlign:"center",padding:"24px 0 20px"}}>
-          <div className="cinzel" style={{fontSize:8,letterSpacing:8,color:E.purpleDim,marginBottom:8,animation:"sh 3s ease-in-out infinite"}}>✦ ESCOLA DO ARCANO ✦</div>
+          <div className="cinzel" style={{fontSize:11,letterSpacing:8,color:E.purpleDim,marginBottom:8,animation:"sh 3s ease-in-out infinite"}}>✦ ESCOLA DO ARCANO ✦</div>
           <div style={{fontSize:44,marginBottom:8,animation:"eyePulse 4s ease-in-out infinite"}}>🌙</div>
-          <h1 className="gothic" style={{fontSize:"clamp(26px,7vw,42px)",color:E.purplePale,letterSpacing:4,marginBottom:4,textShadow:`0 0 30px rgba(123,95,160,.5)`}}>
+          <h1 className="gothic" style={{fontSize:"clamp(32px,8vw,50px)",color:E.purplePale,letterSpacing:4,marginBottom:4,textShadow:`0 0 30px rgba(123,95,160,.5)`}}>
             Lunalva Estudo
           </h1>
-          <p className="gothic" style={{fontSize:"clamp(12px,3.5vw,17px)",color:E.purple,letterSpacing:2,marginBottom:10,opacity:.85,fontStyle:"italic"}}>
+          <p className="gothic" style={{fontSize:"clamp(16px,4vw,22px)",color:E.purple,letterSpacing:2,marginBottom:10,opacity:.85,fontStyle:"italic"}}>
             O caminho começa pelo conhecimento
           </p>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:6}}>
             <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${E.deep})`}}/>
-            <div style={{color:E.purpleDim,fontSize:16}}>✦</div>
+            <div style={{color:E.purpleDim,fontSize:19}}>✦</div>
             <div style={{flex:1,height:1,background:`linear-gradient(90deg,${E.deep},transparent)`}}/>
           </div>
-          <p className="cinzel" style={{fontSize:8,letterSpacing:3,color:E.textDim}}>FUNDAMENTOS · 78 ARCANOS · EXERCÍCIOS DE INTUIÇÃO</p>
+          <p className="cinzel" style={{fontSize:11,letterSpacing:3,color:E.textDim}}>FUNDAMENTOS · 78 ARCANOS · EXERCÍCIOS DE INTUIÇÃO</p>
         </div>
 
         {/* Tabs */}
         <Panel style={{padding:4,marginBottom:20,background:"transparent"}}>
           {TABS_E.map(t=>(
-            <button key={t.id} onClick={()=>setTab(t.id)} className="cinzel" style={{width:"50%",padding:"9px 4px",borderRadius:8,border:"none",background:tab===t.id?"rgba(123,95,160,.11)":"transparent",color:tab===t.id?E.purple:E.textDim,fontSize:"clamp(9px,2.5vw,11px)",letterSpacing:1.5,transition:"all .2s",cursor:"pointer",borderBottom:tab===t.id?`1px solid ${E.purpleBr}`:"1px solid transparent"}}>
-              <div style={{marginBottom:2,fontSize:14}}>{t.icon}</div>
+            <button key={t.id} onClick={()=>setTab(t.id)} className="cinzel" style={{width:"50%",padding:"9px 4px",borderRadius:8,border:"none",background:tab===t.id?"rgba(123,95,160,.11)":"transparent",color:tab===t.id?E.purple:E.textDim,fontSize:"clamp(12px,3vw,14px)",letterSpacing:1.5,transition:"all .2s",cursor:"pointer",borderBottom:tab===t.id?`1px solid ${E.purpleBr}`:"1px solid transparent"}}>
+              <div style={{marginBottom:2,fontSize:17}}>{t.icon}</div>
               <div>{t.l}</div>
             </button>
           ))}
@@ -907,10 +907,10 @@ function App(){
         <div style={{textAlign:"center",marginTop:40}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:7}}>
             <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${E.deep})`}}/>
-            <div style={{color:E.purpleDim,fontSize:14}}>🌙</div>
+            <div style={{color:E.purpleDim,fontSize:17}}>🌙</div>
             <div style={{flex:1,height:1,background:`linear-gradient(90deg,${E.deep},transparent)`}}/>
           </div>
-          <div className="cinzel" style={{fontSize:7,letterSpacing:3,color:E.textFaint}}>✦ LUNALVA ESTUDO · MATERIAL SAGRADO ✦</div>
+          <div className="cinzel" style={{fontSize:10,letterSpacing:3,color:E.textFaint}}>✦ LUNALVA ESTUDO · MATERIAL SAGRADO ✦</div>
         </div>
       </div>
     </div>
