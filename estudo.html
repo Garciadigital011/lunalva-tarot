@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Lunalva Estudo — Tarot Sagrado</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#04030a;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(120,80,180,.2);border-radius:2px}
+.gothic{font-family:'UnifrakturMaguntia',cursive}
+.cinzel{font-family:'Cinzel',serif}
+.garamond{font-family:'EB Garamond',serif}
+button{cursor:pointer}
+textarea,input{font-family:'EB Garamond',serif}
+@keyframes tw{from{opacity:.03;transform:scale(.4)}to{opacity:.65;transform:scale(1.6)}}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sp{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes sh{0%,100%{opacity:.2}60%{opacity:.85}}
+@keyframes gl{0%,100%{box-shadow:0 0 8px rgba(120,80,180,.07)}50%{box-shadow:0 0 22px rgba(120,80,180,.25)}}
+@keyframes eyePulse{0%,100%{opacity:.5}50%{opacity:.9}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const{useState,useEffect,useRef,useCallback}=React;
+
+// ── PALETA ESTUDO — dourado envelhecido (igual ao Arcana) ─────────
+const E={
+  bg:"#060503",panel:"#0c0a06",
+  purple:"#8a7448",purpleBr:"#9e8555",purplePale:"#baa06e",
+  purpleDim:"rgba(138,116,72,0.55)",
+  deep:"#5c4828",deepDim:"rgba(92,72,40,0.40)",
+  border:"rgba(138,116,72,0.22)",borderBr:"rgba(158,133,85,0.45)",
+  text:"rgba(200,180,138,0.88)",textDim:"rgba(164,144,100,0.50)",
+  textFaint:"rgba(138,116,72,0.32)",
+  gold:"#8a7448",goldBr:"#9e8555",
+};
+
+// ── ESTRELAS ──────────────────────────────────────────────────────
+const STARS=Array.from({length:100},(_,i)=>({x:(i*137.5)%100,y:(i*97.3)%100,s:.2+((i*31)%16)/12,d:(i*43)%6,dur:2.5+(i*17)%5}));
+function Stars(){
+  return <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0}}>
+    {STARS.map((s,i)=><div key={i} style={{position:"absolute",left:`${s.x}%`,top:`${s.y}%`,width:`${s.s}px`,height:`${s.s}px`,borderRadius:"50%",background:s.s>1.2?E.purple:"rgba(220,190,130,.4)",animation:`tw ${s.dur}s ${s.d}s ease-in-out infinite alternate`}}/>)}
+  </div>;
+}
+
+function SideBars(){
+  const b={position:"fixed",top:0,bottom:0,width:3,zIndex:20,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`,opacity:.7};
+  return <><div style={{...b,left:0}}/><div style={{...b,right:0}}/></>;
+}
+
+function Panel({children,style={}}){
+  return(
+    <div style={{position:"relative",background:E.panel,border:`1px solid ${E.border}`,borderRadius:10,padding:"16px 18px",overflow:"hidden",...style}}>
+      <div style={{position:"absolute",top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${E.purple},${E.purplePale},${E.purple},transparent)`}}/>
+      <div style={{position:"absolute",bottom:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${E.deep},transparent)`}}/>
+      <div style={{position:"absolute",top:0,left:0,bottom:0,width:1,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`}}/>
+      <div style={{position:"absolute",top:0,right:0,bottom:0,width:1,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`}}/>
+      {[{top:4,left:4},{top:4,right:4},{bottom:4,left:4},{bottom:4,right:4}].map((pos,i)=>(
+        <svg key={i} viewBox="0 0 14 14" width={14} height={14} style={{position:"absolute",...pos,opacity:.55}}>
+          <path d={i<2?"M0,12 L0,0 L12,0":"M0,2 L0,14 L12,14"} fill="none" stroke={E.purple} strokeWidth="1.2"/>
+        </svg>
+      ))}
+      {children}
+    </div>
+  );
+}
+
+// ── DADOS ARCANOS ─────────────────────────────────────────────────
+const MAJOR=[
+  {id:0,name:"O Louco",num:"0",sym:"☽",el:"Ar",planet:"Urano",move:true,ml:"MOVIMENTO",cols:["#080c10","#101825"],
+   essence:"O salto antes do medo. Alma pura que começa antes de estar pronta.",
+   kw:"liberdade · começo · inocência · risco · aventura",
+   cores:"Branco e amarelo — pureza, luz solar, inocência do espírito livre",
+   numerologia:"0 — potencial absoluto. Antes de qualquer número. O vazio que contém tudo.",
+   simbolismo:"A mochila pequena (experiência limitada), o abismo à frente (o salto de fé), o cãozinho (o mundo mundano tentando reter), a flor branca (pureza de intenção).",
+   ensinamento:"Às vezes é preciso começar sem estar pronto. A inocência não é fraqueza — é coragem.",
+   d:{g:"Novo ciclo. Salto de fé. Você tem tudo que precisa.",a:"Encontro inesperado. Leveza.",t:"Novo projeto ousado.",e:"Confie e dê o passo."},
+   r:{g:"Impulsividade ou paralisação por medo.",a:"Imaturidade emocional.",t:"Decisões precipitadas.",e:"Busca sem profundidade."}},
+  {id:1,name:"O Mago",num:"I",sym:"⬡",el:"Fogo",planet:"Mercúrio",move:true,ml:"MOVIMENTO",cols:["#150800","#3a1500"],
+   essence:"O poder de transformar vontade em realidade.",
+   kw:"manifestação · habilidade · vontade · ação · poder",
+   cores:"Vermelho e branco — ação e pureza de intenção. A mesa com os 4 elementos.",
+   numerologia:"I — unidade. A força criadora primordial. Do 0 nasce o 1.",
+   simbolismo:"Os 4 instrumentos na mesa (os 4 naipes/elementos), o símbolo do infinito sobre a cabeça, uma mão apontando para cima e outra para baixo — 'como acima, assim abaixo'.",
+   ensinamento:"Você tem todas as ferramentas. O que falta é intenção clara e vontade de agir.",
+   d:{g:"Aja com intenção — transforme pensamento em realidade.",a:"Encanto e magnetismo.",t:"Hora de brilhar.",e:"Intenções têm poder de manifestação."},
+   r:{g:"Talentos bloqueados ou manipulação.",a:"Sedução superficial.",t:"Talentos não reconhecidos.",e:"Magia mal direcionada."}},
+  {id:2,name:"A Sacerdotisa",num:"II",sym:"☾",el:"Água",planet:"Lua",move:false,ml:"ESTASE",cols:["#050e28","#0a1840"],
+   essence:"O mistério que só pode ser sentido. Sabedoria no silêncio.",
+   kw:"intuição · mistério · paciência · sabedoria oculta · segredos",
+   cores:"Azul, branco e preto — o inconsciente, a pureza e o desconhecido. O véu entre mundos.",
+   numerologia:"II — dualidade. O espaço entre opostos onde a sabedoria mora.",
+   simbolismo:"O véu com romãs (fertilidade oculta), as colunas B e J (dualidade), o pergaminho (conhecimento guardado), a lua a seus pés (domínio do inconsciente).",
+   ensinamento:"Não tudo precisa ser dito ou explicado. Às vezes a sabedoria maior é o silêncio.",
+   d:{g:"Não aja — ouça. A resposta está dentro.",a:"Amor velado. Confie na intuição.",t:"Aguarde clareza.",e:"Alta sensibilidade. Sonhos trazem mensagens."},
+   r:{g:"Intuição bloqueada ou segredos expostos.",a:"Ciúmes ou sentimentos escondidos.",t:"Informações incompletas.",e:"Voz interior abafada."}},
+  {id:3,name:"A Imperatriz",num:"III",sym:"♀",el:"Terra",planet:"Vênus",move:true,ml:"MOVIMENTO",cols:["#0a1400","#182500"],
+   essence:"Abundância que flui quando você se permite criar e receber.",
+   kw:"fertilidade · abundância · criação · beleza · sensualidade",
+   cores:"Verde, dourado e rosado — natureza em flor, fertilidade, amor encarnado.",
+   numerologia:"III — expressão e criatividade. Da dualidade nasce a criação.",
+   simbolismo:"O campo de trigo (abundância material), o símbolo de Vênus no escudo (amor e beleza), a coroa de estrelas (conexão com o céu), o rio (fluxo emocional).",
+   ensinamento:"O que você cuida e rega com amor cresce. Permita-se criar e receber sem culpa.",
+   d:{g:"Florescimento. Abundância material e emocional.",a:"Amor fértil e sensual.",t:"Projetos criativos florescem.",e:"Conexão com a Terra."},
+   r:{g:"Bloqueio criativo.",a:"Possessividade.",t:"Esgotamento criativo.",e:"Desconexão do corpo."}},
+  {id:4,name:"O Imperador",num:"IV",sym:"♂",el:"Fogo",planet:"Marte",move:false,ml:"ESTASE",cols:["#1a0a00","#3a1800"],
+   essence:"A ordem que cria condições para tudo crescer com segurança.",
+   kw:"autoridade · estrutura · estabilidade · liderança · disciplina",
+   cores:"Vermelho e laranja — poder, ação, fogo controlado. O rochedo atrás (solidez).",
+   numerologia:"IV — estabilidade e fundação. Os 4 pilares que sustentam.",
+   simbolismo:"O trono de pedra (poder sólido), a armadura (proteção), o carneiro (Áries/Marte), o cetro em forma de ankh (vida e poder unidos).",
+   ensinamento:"Estrutura não é prisão — é o que permite que coisas frágeis sobrevivam e cresçam.",
+   d:{g:"Organizar e liderar. Bases sólidas.",a:"Parceiro estável e comprometido.",t:"Liderança natural.",e:"Disciplina espiritual."},
+   r:{g:"Autoritarismo ou caos.",a:"Relacionamento controlador.",t:"Abuso de poder.",e:"Dogmatismo."}},
+  {id:5,name:"O Hierofante",num:"V",sym:"☩",el:"Terra",planet:"Touro",move:false,ml:"ESTASE",cols:["#0f0a00","#251800"],
+   essence:"O guardião do sagrado que une o humano ao divino.",
+   kw:"tradição · ensinamento · espiritualidade · rituais · mentores",
+   cores:"Vermelho, branco e ouro — realeza espiritual, pureza e sabedoria institucional.",
+   numerologia:"V — mudança e mediação. O ponto entre o divino e o humano.",
+   simbolismo:"As duas colunas (dualidade novamente, mas sagrada), as duas figuras ajoelhadas (discípulos), a mão levantada (bênção), as chaves (as chaves do céu).",
+   ensinamento:"Às vezes precisamos de um guia, de uma tradição, de um ritual. Não é fraqueza — é sabedoria coletiva.",
+   d:{g:"Busque mentores e rituais.",a:"Comprometimento profundo.",t:"Siga os procedimentos.",e:"Prática espiritual formal."},
+   r:{g:"Quebra de tradições necessária.",a:"Pressão externa na relação.",t:"Questionar estruturas.",e:"Espiritualidade pessoal."}},
+  {id:6,name:"Os Amantes",num:"VI",sym:"♡",el:"Ar",planet:"Gêmeos",move:true,ml:"MOVIMENTO",cols:["#08080c","#141420"],
+   essence:"Quando amor e valores se alinham, nasce o sagrado.",
+   kw:"amor · escolha · valores · união · alinhamento · decisão",
+   cores:"Dourado e branco — escolha iluminada, amor puro, o divino abençoando a união.",
+   numerologia:"VI — harmonia e responsabilidade. A escolha que cria compromisso.",
+   simbolismo:"O anjo acima (o divino guiando), a mulher olha para o anjo (consciência), o homem olha para a mulher (desejo), a árvore do conhecimento com a serpente (tentação), a árvore da vida com chamas (paixão).",
+   ensinamento:"A maior escolha não é entre duas pessoas — é entre dois conjuntos de valores. Escolha com o coração.",
+   d:{g:"Escolha importante. Faça com o coração.",a:"Amor profundo e recíproco.",t:"Trabalho alinhado com valores.",e:"O amor como via espiritual."},
+   r:{g:"Escolha adiada. Desalinhamento.",a:"Triângulo ou indecisão.",t:"Trabalho contradiz valores.",e:"Integração de opostos difícil."}},
+  {id:7,name:"O Carro",num:"VII",sym:"⚡",el:"Água",planet:"Câncer",move:true,ml:"MOVIMENTO RÁPIDO",cols:["#050e28","#0d1e48"],
+   essence:"Quando vontade e disciplina se unem, nada para o guerreiro.",
+   kw:"vitória · determinação · controle · conquista · autodomínio",
+   cores:"Azul estrelado, preto e branco — o guerreiro que domina os opostos (esfinges preta e branca).",
+   numerologia:"VII — movimento e determinação. A força que avança com propósito.",
+   simbolismo:"As duas esfinges (forças opostas controladas pela vontade), o baldaquim de estrelas (conexão com o cosmos), a armadura com crescentes lunares (Câncer — emoções controladas), a coroa de estrelas.",
+   ensinamento:"Vitória não vem da força bruta. Vem do domínio dos próprios impulsos e da direção clara.",
+   d:{g:"Você vai vencer. Determinação leva ao triunfo.",a:"Conquista amorosa com persistência.",t:"Vitória profissional chegando.",e:"Domínio das emoções."},
+   r:{g:"Falta de direção.",a:"Controle na relação.",t:"Projetos estagnados.",e:"Ego a serviço do poder."}},
+  {id:8,name:"A Força",num:"VIII",sym:"∞",el:"Fogo",planet:"Leão",move:true,ml:"MOVIMENTO INTERNO",cols:["#180800","#301000"],
+   essence:"A força que não vence pelo músculo — mas pelo coração.",
+   kw:"coragem · paciência · compaixão · força interior · magnetismo",
+   cores:"Branco e dourado — pureza de intenção dominando o instinto (o leão).",
+   numerologia:"VIII — poder e infinito. A força que não se esgota porque nasce de dentro.",
+   simbolismo:"A mulher de branco (consciência) abrindo gentilmente a boca do leão (o instinto), o símbolo do infinito sobre a cabeça (força ilimitada), as flores ao redor (natureza tranquila).",
+   ensinamento:"A força real não domina pela violência — ela acalma, gentilmente, com amor e presença.",
+   d:{g:"O verdadeiro poder vem da calma.",a:"Relação apaixonada. Influência suave.",t:"Superar desafios com calma.",e:"Integração da sombra com compaixão."},
+   r:{g:"Medo que paralisa.",a:"Medo de se entregar.",t:"Dúvida que sabota.",e:"Luta interna não resolvida."}},
+  {id:9,name:"O Eremita",num:"IX",sym:"🕯",el:"Terra",planet:"Virgem",move:false,ml:"RECOLHIMENTO",cols:["#0a0a06","#18180e"],
+   essence:"A lanterna que ilumina o próprio caminho. Sabedoria encontrada no silêncio.",
+   kw:"sabedoria · solidão · busca interior · iluminação · reflexão",
+   cores:"Cinza e dourado — o velho que ilumina sozinho na escuridão. Neutralidade sábia.",
+   numerologia:"IX — conclusão e sabedoria. O número que encerra um ciclo com entendimento.",
+   simbolismo:"A lanterna com a Estrela de Davi (a luz da sabedoria), o cajado (apoio na jornada), o capuz cinza (anonimato, o ego esvaziado), a neve ao redor (isolamento escolhido).",
+   ensinamento:"Há períodos em que o caminho só pode ser feito sozinho. O silêncio não é vazio — é onde a sabedoria fala.",
+   d:{g:"Recolhimento necessário. A resposta está dentro.",a:"Amor maduro e profundo.",t:"Planejar em silêncio.",e:"Jornada contemplativa."},
+   r:{g:"Isolamento excessivo.",a:"Solidão indesejada.",t:"Paralisia por excesso de análise.",e:"Espiritualidade foge do mundo."}},
+  {id:10,name:"Roda da Fortuna",num:"X",sym:"⊕",el:"Fogo",planet:"Júpiter",move:true,ml:"GRANDE MOVIMENTO",cols:["#0f0800","#281800"],
+   essence:"O destino em movimento. Os ciclos são lei — o que sobe desce, o que desce sobe.",
+   kw:"ciclos · destino · sorte · karma · mudança · oportunidade",
+   cores:"Azul, dourado e roxo — o cosmos em movimento, riqueza e destino entrelaçados.",
+   numerologia:"X — completude e novo começo. 1+0=1. Um ciclo se fecha, outro começa.",
+   simbolismo:"As quatro criaturas nos cantos (os 4 evangelistas / 4 elementos estáveis), a Esfinge no topo (sabedoria acima das mudanças), o ROTA inscrito (roda do destino), Anúbis subindo (o que sobe), a serpente descendo (o que cai).",
+   ensinamento:"Nada é permanente. A roda gira sempre. A sabedoria é manter o centro enquanto tudo muda.",
+   d:{g:"A roda gira a seu favor. Sorte chegando.",a:"Reviravolta no amor. Karma se resolve.",t:"Oportunidade inesperada.",e:"Compreensão dos ciclos."},
+   r:{g:"Resistência às mudanças.",a:"Ciclos repetidos.",t:"Período de azar.",e:"Apego ao que acabou."}},
+  {id:11,name:"A Justiça",num:"XI",sym:"⚖",el:"Ar",planet:"Libra",move:false,ml:"ESTASE",cols:["#0c0a00","#201800"],
+   essence:"A lei implacável da causa e efeito. Cada ação colhe seu fruto.",
+   kw:"justiça · equilíbrio · verdade · karma · lei · consequência",
+   cores:"Vermelho e cinza — ação e neutralidade. A balança dourada, a espada da verdade.",
+   numerologia:"XI — equilíbrio e causa-efeito. 1+1=2. A dualidade julgada.",
+   simbolismo:"A balança (equilíbrio e julgamento), a espada de dois gumes (a verdade corta dos dois lados), o véu entre as colunas (o que está oculto será revelado), a coroa com quadrado (lei e estrutura).",
+   ensinamento:"A justiça não é sobre punição — é sobre equilíbrio. O karma não castiga: ele restaura.",
+   d:{g:"A verdade prevalece. Equilíbrio restaurado.",a:"Relacionamento justo.",t:"Decisões justas.",e:"Lei do karma em ação."},
+   r:{g:"Injustiça ou fuga das consequências.",a:"Desequilíbrio na relação.",t:"Decisões injustas.",e:"Fuga da responsabilidade."}},
+  {id:12,name:"O Pendurado",num:"XII",sym:"☊",el:"Água",planet:"Netuno",move:false,ml:"PAUSA SAGRADA",cols:["#04080f","#080e1e"],
+   essence:"A pausa que ilumina. Quem se rende descobre o que o movimento nunca revelaria.",
+   kw:"sacrifício · rendição · nova perspectiva · pausa · entrega",
+   cores:"Azul e dourado — o homem pendurado com auréola (iluminação pela rendição).",
+   numerologia:"XII — 1+2=3. Criação através do sacrifício. A rendição que gera novo.",
+   simbolismo:"O homem pendurado pelo pé (voluntariamente — não está acorrentado), a expressão serena (paz na entrega), a auréola dourada (iluminação alcançada pela pausa), a perna dobrada em 4 (número da estabilidade como base da rendição).",
+   ensinamento:"Às vezes a ação mais poderosa é parar. Quem se entrega voluntariamente descobre o que a luta nunca revelaria.",
+   d:{g:"Pausa necessária. A rendição é sabedoria.",a:"Sacrifício por amor.",t:"Revisar perspectiva.",e:"O ego para para a alma falar."},
+   r:{g:"Resistência à rendição.",a:"Martirização.",t:"Estagnação voluntária.",e:"Orgulho que não cede."}},
+  {id:13,name:"A Morte",num:"XIII",sym:"♆",el:"Água",planet:"Plutão",move:true,ml:"GRANDE TRANSFORMAÇÃO",cols:["#040408","#0a0a18"],
+   essence:"Nada morre sem que algo nasça. A Morte é sempre porta de transformação.",
+   kw:"transformação · fim · início · renovação · renascimento · ciclo",
+   cores:"Preto e branco — a dualidade absoluta. A bandeira branca com a rosa (algo puro sempre sobrevive).",
+   numerologia:"XIII — o número da transformação. 1+3=4. A destruição que cria nova estrutura.",
+   simbolismo:"A figura esquelética na armadura preta (a morte inevitável), o cavalo branco (a morte purifica), as figuras caídas (o rei, o bispo, a criança — a morte não distingue), a bandeira negra com rosa branca (da morte nasce algo puro), o sol nascente entre os pilares (sempre há um amanhecer depois).",
+   ensinamento:"A Morte no tarot raramente significa morte física. Significa: algo precisa terminar para que o novo possa existir.",
+   d:{g:"Uma fase termina. O que vem é melhor.",a:"Transformação profunda do relacionamento.",t:"Fim de ciclo. Espaço para o novo.",e:"Morte do ego. Renascimento."},
+   r:{g:"Resistência à mudança.",a:"Relação morta mantida por medo.",t:"Medo de mudar.",e:"O ego resiste ao crescimento."}},
+  {id:14,name:"A Temperança",num:"XIV",sym:"△",el:"Fogo",planet:"Sagitário",move:true,ml:"MOVIMENTO SUAVE",cols:["#0c0800","#201400"],
+   essence:"A alquimia do equilíbrio. Paciência que mistura opostos até criar algo precioso.",
+   kw:"equilíbrio · moderação · paciência · integração · alquimia · cura",
+   cores:"Branco, azul e dourado — o anjo alquimista misturando as águas, o caminho dourado ao fundo.",
+   numerologia:"XIV — 1+4=5. A mudança que vem da integração, não da ruptura.",
+   simbolismo:"O anjo com asas (ser espiritual), os dois cálices com água fluindo entre eles (alquimia), um pé na terra um pé n'água (equilíbrio entre mundos), o triângulo no peito (os três princípios), o caminho dourado ao fundo (o propósito).",
+   ensinamento:"A cura mais profunda não vem de extremos — vem da mistura paciente dos opostos até encontrar o equilíbrio.",
+   d:{g:"Equilíbrio. A paciência cria resultados.",a:"Relação equilibrada.",t:"Paixão e praticidade juntas.",e:"Alquimia espiritual."},
+   r:{g:"Desequilíbrio ou excesso.",a:"Falta de comunicação.",t:"Excesso de trabalho.",e:"Espiritualidade foge do mundo."}},
+  {id:15,name:"O Diabo",num:"XV",sym:"♄",el:"Terra",planet:"Capricórnio",move:false,ml:"APRISIONAMENTO",cols:["#0a0400","#180800"],
+   essence:"A corrente que parece real mas é criada pela mente. A porta sempre esteve aberta.",
+   kw:"apego · ilusão · materialismo · sombra · vício · obsessão · medo",
+   cores:"Preto e escarlate — o mundo das sombras, os apegos materiais, o fogo dos vícios.",
+   numerologia:"XV — 1+5=6. A harmonia distorcida. O amor virado em apego e controle.",
+   simbolismo:"O Diabo com chifres de Bode de Mendes (Capricórnio/matéria), as correntes frouxas ao redor do pescoço das figuras (elas podem sair — escolhem ficar), o homem e a mulher com rabos (a animalidade alimentada), a tocha invertida (luz usada para destruir).",
+   ensinamento:"O Diabo representa o que te prende — mas as correntes são frouxas. Você pode tirar quando quiser. A prisão é mental.",
+   d:{g:"Algo te prende. A corrente tem chave.",a:"Atração intensa. Possível dependência.",t:"Ambição excessiva.",e:"Encontro com a sombra."},
+   r:{g:"Libertação de padrões que prendiam.",a:"Saindo de relacionamento tóxico.",t:"Libertando-se do trabalho escravo.",e:"Integração da sombra."}},
+  {id:16,name:"A Torre",num:"XVI",sym:"⚡",el:"Fogo",planet:"Marte",move:true,ml:"RUPTURA",cols:["#180800","#301000"],
+   essence:"A destruição do falso para revelar o verdadeiro. O raio ilumina enquanto destrói.",
+   kw:"ruptura · revelação · colapso · verdade · libertação súbita · despertar",
+   cores:"Preto, laranja e amarelo — a noite da destruição, as chamas, as figuras caindo.",
+   numerologia:"XVI — 1+6=7. O movimento forçado. A sete que precisou de um raio para se mover.",
+   simbolismo:"A torre (o ego, as construções falsas), o raio que a atinge (a verdade divina), as figuras caindo (o que foi construído sobre base falsa cai), a coroa voando (o poder ilusório perdido), as chamas (transformação pelo fogo).",
+   ensinamento:"A Torre destrói o que não deveria existir. Quanto mais resiste, mais violenta a queda. Deixe cair.",
+   d:{g:"Ruptura necessária. O novo é mais sólido.",a:"Revelação súbita. Ruptura que liberta.",t:"Virada que abre espaço.",e:"Despertar abrupto."},
+   r:{g:"Resistência à mudança inevitável.",a:"Relação no limite.",t:"Adiamento do necessário.",e:"Resistência ao despertar."}},
+  {id:17,name:"A Estrela",num:"XVII",sym:"✦",el:"Ar",planet:"Aquário",move:true,ml:"ESPERANÇA",cols:["#040810","#081018"],
+   essence:"A luz que guia após a tempestade. Esperança nascida da experiência.",
+   kw:"esperança · renovação · fé · inspiração · cura · propósito · guia",
+   cores:"Azul, dourado e branco — o céu noturno com a estrela guia, a água curando a terra.",
+   numerologia:"XVII — 1+7=8. O poder que renova. A força que cura após a destruição.",
+   simbolismo:"A mulher despida (transparência, vulnerabilidade sagrada), os dois jarros d'água (curando a terra e as águas), a grande estrela central com 8 pontas (Vênus/renovação), as 7 estrelas ao redor (os 7 chakras/planetas), o pássaro na árvore (o ibis de Thoth — sabedoria).",
+   ensinamento:"Depois da Torre vem a Estrela. Sempre. A esperança não é ingenuidade — é coragem de acreditar depois de ter sido destruída.",
+   d:{g:"Após a escuridão, a luz. Renovação.",a:"Cura após dor amorosa.",t:"Renovação. Propósito.",e:"Reconexão espiritual profunda."},
+   r:{g:"Desesperança ou expectativas irreais.",a:"Idealização excessiva.",t:"Desânimo.",e:"Crise espiritual."}},
+  {id:18,name:"A Lua",num:"XVIII",sym:"☾",el:"Água",planet:"Peixes",move:false,ml:"NEBLINA",cols:["#04060f","#080c1e"],
+   essence:"O caminho na escuridão onde nada é o que parece. Coragem dissolve a ilusão.",
+   kw:"ilusão · medo · inconsciente · sonhos · confusão · intuição · engano",
+   cores:"Azul escuro, cinza e dourado — a noite, o caminho incerto, o reflexo que engana.",
+   numerologia:"XVIII — 1+8=9. A sabedoria antes da completude. A última prova antes do Sol.",
+   simbolismo:"A lua cheia com rosto (o inconsciente refletido), o caminho entre duas torres (o caminho estreito na escuridão), o lagarto/carangueijo saindo da água (o inconsciente emergindo), o lobo e o cão uivando (o instinto selvagem e o domesticado), as gotas caindo (o inconsciente gotejando na consciência).",
+   ensinamento:"A Lua não mente — ela revela. Quando tudo parece confuso, é porque há algo que você ainda não quer ver.",
+   d:{g:"Período de neblina. Confie na intuição.",a:"Segredos na relação. Algo oculto.",t:"Aguarde clareza.",e:"Purificação do inconsciente."},
+   r:{g:"Confusão se dissipando.",a:"Segredo revelado.",t:"Clareza após período nebuloso.",e:"Medos sendo liberados."}},
+  {id:19,name:"O Sol",num:"XIX",sym:"☉",el:"Fogo",planet:"Sol",move:true,ml:"PLENITUDE",cols:["#180a00","#3a1800"],
+   essence:"A alegria sem sombra. Clareza absoluta, vitalidade plena e o sim da vida.",
+   kw:"alegria · vitória · clareza · vitalidade · sucesso · pureza · luz",
+   cores:"Amarelo, laranja e vermelho — a luz solar em sua plenitude. Vida, energia, calor.",
+   numerologia:"XIX — 1+9=10=1. O retorno à unidade depois de tudo. A completude que reinicia.",
+   simbolismo:"O sol radiante (consciência plena, clareza total), a criança no cavalo branco (inocência que sobreviveu à jornada), a bandeira vermelha (conquista com vitalidade), as flores ao redor (a vida celebrando), o muro baixo (as barreiras já não importam).",
+   ensinamento:"O Sol não precisa de permissão para brilhar. Depois de toda escuridão, você tem o direito de ser feliz.",
+   d:{g:"Luz, alegria e sucesso. Celebre.",a:"Amor puro e recíproco.",t:"Sucesso e reconhecimento.",e:"Iluminação e alegria."},
+   r:{g:"Alegria bloqueada.",a:"Orgulho que afasta.",t:"Arrogância.",e:"Vaidade espiritual."}},
+  {id:20,name:"O Julgamento",num:"XX",sym:"☄",el:"Fogo",planet:"Plutão",move:true,ml:"RENASCIMENTO",cols:["#100808","#201010"],
+   essence:"O chamado que não pode mais ser ignorado. Despertar para quem você realmente é.",
+   kw:"renovação · despertar · chamado · absolvição · propósito · renascimento",
+   cores:"Branco, azul e dourado — o anjo da renovação, as figuras ressurgindo, o chamado divino.",
+   numerologia:"XX — 2+0=2. A dualidade julgada e resolvida. O chamado que une os opostos.",
+   simbolismo:"O anjo Gabriel com a trombeta (o chamado divino), as figuras saindo dos caixões (renascimento), os braços abertos (rendição ao chamado), a bandeira branca com cruz vermelha (a vida recomeçada), as montanhas ao fundo (desafios que ficaram para trás).",
+   ensinamento:"Há um chamado em você que não vai parar de soar até ser atendido. Essa carta é ele.",
+   d:{g:"Um chamado ressoa. Responda à sua alma.",a:"Reencontro. Perdão que liberta.",t:"Chamado para novo propósito.",e:"Despertar profundo."},
+   r:{g:"Resistência ao chamado.",a:"Incapacidade de perdoar.",t:"Ignorar o propósito por medo.",e:"O ego resiste ao despertar."}},
+  {id:21,name:"O Mundo",num:"XXI",sym:"◉",el:"Terra",planet:"Saturno",move:true,ml:"COMPLETUDE",cols:["#080c08","#101810"],
+   essence:"A dança do ser realizado. O ciclo que se fecha com maestria.",
+   kw:"completude · conquista · integração · celebração · realização",
+   cores:"Verde, violeta e dourado — a natureza em êxtase, a coroa de louros, a dança da realização.",
+   numerologia:"XXI — 2+1=3. A expressão máxima. O 3 que chegou ao seu potencial completo.",
+   simbolismo:"A figura dançante envoluta em véu (o ser que se revela e se protege), as quatro criaturas nos cantos (os 4 evangelistas/elementos em harmonia), a coroa de louros em formato oval (a mandorla — portal de realização), os bastões em cada mão (o domínio conquistado).",
+   ensinamento:"O Mundo não é um destino — é um estado de ser. Você chegou não quando terminou, mas quando integrou tudo.",
+   d:{g:"Realização plena. Um ciclo se fecha.",a:"Amor realizado e completo.",t:"Grande conquista coroada.",e:"Integração. O ser que você veio ser."},
+   r:{g:"Ciclo não concluído.",a:"Algo impede a plenitude.",t:"Sucesso não reconhecido.",e:"Integração inacabada."}},
+];
+
+const SUIT_META={
+  Paus:{el:"Fogo",sym:"🜂",cols:["#2a0c00","#6b2000"],move:true,ml:"MOVIMENTO",domain:"energia, criação, paixão, ambição",
+    ensinamento:"Paus é o fogo interior. A vontade de criar, agir e transformar. Quando Paus aparece, algo está se movendo — projetos, paixões, inspirações.",
+    cores:"Vermelho, laranja e verde — o bastão que brota folhas (o fogo que gera vida)."},
+  Copas:{el:"Água",sym:"🜄",cols:["#050e28","#0d2660"],move:false,ml:"ESTASE",domain:"emoções, amor, sonhos, intuição",
+    ensinamento:"Copas é o mundo das emoções, dos sentimentos, dos sonhos. Quando Copas aparece, o coração está falando. Ouça.",
+    cores:"Azul, prateado e branco — a água das emoções, a taça que contém o que sentimos."},
+  Espadas:{el:"Ar",sym:"🜁",cols:["#0c0c0c","#201c14"],move:true,ml:"MOVIMENTO",domain:"mente, conflito, comunicação, verdade",
+    ensinamento:"Espadas é a mente em ação — pensamentos, conflitos, comunicação, decisões difíceis. A espada corta para revelar a verdade, mas também pode ferir.",
+    cores:"Cinza, azul e branco — o ar cortante da mente, as nuvens tempestuosas da razão."},
+  Ouros:{el:"Terra",sym:"🜃",cols:["#140e00","#302000"],move:false,ml:"ESTASE",domain:"material, dinheiro, corpo, estabilidade",
+    ensinamento:"Ouros fala do mundo material — dinheiro, trabalho, saúde, corpo. É o elemento Terra: o que é construído com esforço e perseverança.",
+    cores:"Dourado, verde e marrom — a terra fértil, o disco de ouro, a prosperidade concreta."},
+};
+
+const RANKS=["Ás","2","3","4","5","6","7","8","9","10","Valete","Cavaleiro","Rainha","Rei"];
+const RANK_E={"Ás":"Semente e potencial puro","2":"Dualidade, escolha entre dois","3":"Crescimento ou dor partilhada","4":"Estabilidade ou estagnação","5":"Conflito, perda, desafio","6":"Harmonia após o conflito","7":"Reflexão ou fé posta à prova","8":"Progresso acelerado ou aprisionamento","9":"Resistência final antes da realização","10":"Completude ou excesso","Valete":"Mensageiro jovem, notícia nova","Cavaleiro":"Ação em movimento — o elemento em sua forma mais pura e intensa","Rainha":"Sabedoria receptiva e maturidade interior","Rei":"Domínio maduro e autoridade conquistada"};
+
+const MINOR=Object.entries(SUIT_META).flatMap(([suit,sm],si)=>
+  RANKS.map((rank,ri)=>({
+    id:22+si*14+ri,name:`${rank} de ${suit}`,num:rank,suit,type:"menor",
+    sym:sm.sym,el:sm.el,move:sm.move,ml:sm.ml,cols:sm.cols,
+    essence:`${RANK_E[rank]} no domínio de ${sm.domain}`,
+    kw:`${sm.domain} · ${RANK_E[rank].toLowerCase()}`,
+    ensinamento:sm.ensinamento,cores:sm.cores,
+    d:{g:`${rank} de ${suit}: ${RANK_E[rank]}. Domínio: ${sm.domain}.`,a:`No amor, vibração de ${RANK_E[rank].toLowerCase()} através do ${sm.el}.`,t:`No trabalho, ${RANK_E[rank].toLowerCase()} no campo de ${sm.domain}.`,s:`Nas relações: ${RANK_E[rank].toLowerCase()} mediado pelo ${sm.el}.`,e:`Convite espiritual para trabalhar ${RANK_E[rank].toLowerCase()}.`},
+    r:{g:`Invertido: ${RANK_E[rank].toLowerCase()} bloqueia ou se excede.`,a:`Bloqueio em viver ${RANK_E[rank].toLowerCase()} no amor.`,t:`Obstáculo — energia represada.`,s:`Tensão social ligada a ${RANK_E[rank].toLowerCase()}.`,e:`Transformar ${RANK_E[rank].toLowerCase()} de bloqueio em aprendizado.`},
+  }))
+);
+const ALL=[...MAJOR.map(c=>({...c,type:"maior"})),...MINOR];
+
+// ── FUNDAMENTOS ───────────────────────────────────────────────────
+const FUNDAMENTOS=[
+  {id:"origem",icon:"🌙",titulo:"A Origem do Tarot",conteudo:`O Tarot não é uma invenção moderna. Suas raízes mais profundas se entrelaçam com a Cabala judaica, o hermetismo egípcio, a numerologia pitagórica e a astrologia babilônica. As primeiras cartas conhecidas como tarot surgiram na Itália do século XV, mas o simbolismo nelas gravado é muito mais antigo — como se o conhecimento sagrado de diferentes tradições tivesse encontrado nas cartas uma forma de ser transmitido.
+
+O Tarot não é adivinhação no sentido de "prever o futuro". É uma ferramenta de conexão com o inconsciente, com arquétipos universais e com a sabedoria que já existe dentro de você. As cartas não criam realidades — elas refletem energias que já estão em movimento.
+
+Por isso o Tarot é sagrado. Ele merece ser tratado com respeito, seriedade e preparo.`},
+  {id:"como_funciona",icon:"◉",titulo:"Como o Tarot Funciona",conteudo:`O baralho de Tarot tem 78 cartas divididas em dois grandes grupos: os 22 Arcanos Maiores e os 56 Arcanos Menores.
+
+Os ARCANOS MAIORES representam as grandes forças, lições e arquétipos da vida humana. São os temas universais — amor, morte, transformação, sabedoria, poder. Quando aparecem numa leitura, indicam temas profundos e situações de maior impacto.
+
+Os ARCANOS MENORES representam as situações do cotidiano divididas em 4 naipes: Paus (Fogo — ação e criação), Copas (Água — emoções e amor), Espadas (Ar — mente e conflito) e Ouros (Terra — material e estabilidade).
+
+As cartas não falam sozinhas — elas falam em conjunto. Uma carta muda de tom dependendo das que estão ao redor, da posição no jogo e da intuição de quem lê.`},
+  {id:"intuicao",icon:"👁",titulo:"A Intuição é a Base",conteudo:`Antes de qualquer técnica, antes de qualquer significado decorado, existe a intuição. Esta é a ferramenta mais poderosa de uma tarólogoa.
+
+Quando você olha para uma carta, o que você sente? O que você vê? Que emoção ela desperta? Que palavra surge espontaneamente?
+
+Esse impulso primeiro, antes da mente analítica entrar, é a linguagem do inconsciente — e é exatamente o que o Tarot convida a acessar.
+
+A técnica serve para estruturar e aprofundar. A intuição serve para conectar. Uma sem a outra resulta numa leitura incompleta.
+
+Ao estudar cada carta aqui, sempre pergunte primeiro: O que EU vejo? O que EU sinto? Depois leia o significado.`},
+  {id:"elementos",icon:"🜂",titulo:"Os 4 Elementos Sagrados",conteudo:`Tudo no Tarot é construído sobre os 4 elementos. Eles são a linguagem fundamental do baralho.
+
+🜂 FOGO (Paus) — Energia, vontade, paixão, criatividade, transformação pelo calor. O fogo move, cria e destrói para renovar.
+
+🜄 ÁGUA (Copas) — Emoção, intuição, amor, sonhos, o inconsciente. A água flui, reflete e se molda a qualquer forma.
+
+🜁 AR (Espadas) — Mente, pensamento, comunicação, conflito, decisão. O ar é invisível mas cortante como uma espada.
+
+🜃 TERRA (Ouros) — Matéria, corpo, dinheiro, estabilidade, trabalho. A terra sustenta, nutre e concretiza.
+
+Cada naipe pertence a um elemento. Cada arcano maior também tem sua correspondência elementar. Quando muitas cartas do mesmo elemento aparecem numa leitura, aquele elemento está em destaque na vida da pessoa.`},
+  {id:"numerologia",icon:"✦",titulo:"Numerologia no Tarot",conteudo:`Os números nos Arcanos Maiores (0 ao XXI) e nos naipes (Ás ao 10) têm significados próprios que se somam ao da carta.
+
+0 — Potencial infinito. Antes do começo.
+1 — Iniciação. O começo. Força criadora.
+2 — Dualidade. Escolha. Equilíbrio entre opostos.
+3 — Expressão. Criatividade. Crescimento.
+4 — Estabilidade. Fundação. Estrutura.
+5 — Mudança. Liberdade. Desafio que transforma.
+6 — Harmonia. Responsabilidade. União.
+7 — Reflexão. Espiritualidade. Fé posta à prova.
+8 — Poder. Ciclos. O infinito em movimento.
+9 — Conclusão. Sabedoria antes do fim.
+10 — Completude. Um ciclo se fecha.
+
+Arcanos Maiores com números maiores que 10 somam seus algarismos. XIV=1+4=5. Isso dá uma camada a mais de leitura.`},
+  {id:"movimento",icon:"⚡",titulo:"Movimento e Estase",conteudo:`Uma das chaves únicas do Tarot é entender se uma carta é de MOVIMENTO ou de ESTASE. Isso diz se a energia está em fluxo ou parada.
+
+⚡ CARTAS DE MOVIMENTO — Indicam que algo está acontecendo, mudando ou prestes a chegar. São convites à ação, sinais de transformação em curso. Quando muitas cartas de movimento aparecem, a pessoa está num período de grandes mudanças.
+
+◉ CARTAS DE ESTASE — Indicam que algo está parado, consolidado ou pedindo reflexão. Não é estagnação negativa — é o momento de sentir antes de agir. Quando muitas cartas de estase aparecem, é hora de aguardar antes de agir.
+
+Cada naipe tem sua natureza: Paus e Espadas são de movimento (Fogo e Ar). Copas e Ouros são de estase (Água e Terra). Mas cada carta específica pode ter sua própria energia.
+
+Observar a proporção de movimento/estase numa leitura diz muito sobre o momento da pessoa.`},
+  {id:"corte",icon:"👑",titulo:"As Cartas da Corte",conteudo:`As cartas da corte são o Valete, o Cavaleiro, a Rainha e o Rei de cada naipe. São as mais complexas de interpretar porque podem representar três coisas diferentes:
+
+1. UMA PESSOA — Alguém na vida da pessoa consultada, com as características daquele naipe/posição.
+
+2. UM ASPECTO INTERNO — Uma parte da personalidade da própria pessoa que está ativa.
+
+3. UMA ENERGIA — Uma forma de ser ou agir que é pedida ou que está presente.
+
+VALETE — Energia jovem, mensageiro, notícia nova. A semente do naipe.
+CAVALEIRO — Ação intensa e às vezes impulsiva. O naipe em movimento máximo.
+RAINHA — Sabedoria receptiva. Domínio interior do naipe.
+REI — Autoridade madura. Domínio externo e liderança.
+
+O contexto da leitura sempre dirá qual das três interpretações se aplica.`},
+  {id:"etica",icon:"🔥",titulo:"Ética e Responsabilidade",conteudo:`Esta é a parte mais importante de todo o estudo.
+
+O Tarot tem poder real. Uma palavra dita no momento certo pode transformar uma vida. Uma palavra errada pode ferir. Quem lê cartas para outras pessoas assume uma responsabilidade espiritual que não pode ser tomada de forma leviana.
+
+NUNCA: Diga que alguém vai morrer, que vai ter acidente, que o parceiro vai trair — mesmo que você "veja" isso. O Tarot mostra tendências, não certezas.
+
+NUNCA: Leia para alguém que está em crise emocional aguda com o objetivo de "consertar" — encaminhe para ajuda profissional.
+
+NUNCA: Use o Tarot para manipular alguém ou para influenciar decisões que não são suas.
+
+SEMPRE: Pergunte o que a pessoa quer explorar. Contextualize. Dê ferramentas, não certezas.
+
+SEMPRE: Proteja sua energia antes de uma leitura. Limpe o espaço. Tenha intenção clara.
+
+SEMPRE: Lembre que você é um canal — não a fonte. A humildade é parte do dom.
+
+O dom do Tarot é uma responsabilidade, não um privilégio.`},
+  {id:"embaralhar",icon:"🌀",titulo:"Como Embaralhar com Intenção",conteudo:`O embaralhamento não é só misturar cartas — é um ritual de conexão.
+
+Antes de embaralhar:
+— Limpe o espaço (incenso, sal, ou simplesmente silêncio intencional)
+— Respire fundo e esvazie a mente
+— Formule claramente a pergunta ou intenção
+— Se for para outra pessoa, peça que ela segure as cartas e coloque sua energia nelas
+
+Durante o embaralhamento:
+— Não há regra de quantas vezes embaralhar — siga sua intuição
+— Se uma carta cair, ela quer ser vista. Não ignore.
+— A forma de embaralhar (riffle, hindu, overhand) não importa — o que importa é a intenção
+
+Depois de embaralhar:
+— Corte o baralho em 3 partes com a mão não dominante e reúna
+— Ou peça que a pessoa corte
+— Tire as cartas com calma, sentindo cada uma`},
+  {id:"pergunta",icon:"?",titulo:"Como Formular uma Pergunta",conteudo:`A qualidade da pergunta determina a qualidade da resposta.
+
+PERGUNTAS ABERTAS são melhores que perguntas fechadas.
+"Como posso melhorar minha relação com X?" é melhor que "X vai me trair?".
+"O que preciso saber sobre meu trabalho?" é melhor que "Vou ser promovida?".
+
+PERGUNTAS FOCADAS são melhores que perguntas vagas.
+"O que está bloqueando minha prosperidade?" é melhor que "Como está minha vida?".
+
+NUNCA repita a mesma pergunta no mesmo dia esperando uma resposta diferente. As cartas respondem uma vez. Repetir é tentar forçar um resultado — e o baralho "fecha".
+
+A pergunta deve vir de um lugar de genuína curiosidade e abertura, não de medo ou necessidade de confirmar o que já acredita.`},
+];
+
+// ── COMPONENTE FUNDAMENTO ─────────────────────────────────────────
+function FundamentoCard({f,onClick}){
+  return(
+    <div onClick={onClick} style={{padding:"14px 16px",borderRadius:10,border:`1px solid ${E.border}`,background:E.panel,cursor:"pointer",transition:"all .2s",position:"relative",overflow:"hidden"}}
+      onMouseEnter={e=>e.currentTarget.style.borderColor=E.purpleBr}
+      onMouseLeave={e=>e.currentTarget.style.borderColor=E.border}>
+      <div style={{position:"absolute",top:0,left:0,bottom:0,width:2,background:`linear-gradient(180deg,transparent,${E.purple},transparent)`,opacity:.6}}/>
+      <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:36,height:36,borderRadius:"50%",border:`1px solid ${E.deepDim}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,background:"rgba(123,95,160,.08)",flexShrink:0}}>{f.icon}</div>
+        <div>
+          <div className="cinzel" style={{fontSize:12,color:E.purplePale,marginBottom:2}}>{f.titulo}</div>
+          <div className="garamond" style={{fontSize:11,color:E.textDim,fontStyle:"italic"}}>{f.conteudo.slice(0,60)}…</div>
+        </div>
+        <div style={{color:E.purpleDim,fontSize:16,marginLeft:"auto",flexShrink:0}}>›</div>
+      </div>
+    </div>
+  );
+}
+
+function FundamentoDetalhe({f,onClose}){
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:500,background:E.bg,overflowY:"auto",padding:"20px 18px 30px",animation:"fu .3s ease"}}>
+      <div style={{position:"fixed",left:0,top:0,bottom:0,width:3,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`,opacity:.8}}/>
+      <div style={{position:"fixed",right:0,top:0,bottom:0,width:3,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`,opacity:.8}}/>
+      <div style={{maxWidth:560,margin:"0 auto"}}>
+        <div style={{textAlign:"center",marginBottom:18}}>
+          <div style={{fontSize:36,marginBottom:8}}>{f.icon}</div>
+          <div className="cinzel" style={{fontSize:16,color:E.purplePale,letterSpacing:2}}>{f.titulo}</div>
+          <div style={{width:60,height:1,background:`linear-gradient(90deg,transparent,${E.purpleDim},transparent)`,margin:"10px auto"}}/>
+        </div>
+        <Panel style={{padding:"20px 18px"}}>
+          <div className="garamond" style={{color:E.text,fontSize:15,lineHeight:2.1,whiteSpace:"pre-line"}}>{f.conteudo}</div>
+        </Panel>
+        <div style={{textAlign:"center",marginTop:16}}>
+          <button onClick={onClose} className="cinzel" style={{background:"transparent",border:`1px solid ${E.border}`,borderRadius:8,padding:"9px 24px",color:E.textDim,fontSize:10,letterSpacing:3,cursor:"pointer"}}>VOLTAR</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── TAB FUNDAMENTOS ───────────────────────────────────────────────
+function TabFundamentos(){
+  const[sel,setSel]=useState(null);
+  if(sel)return <FundamentoDetalhe f={sel} onClose={()=>setSel(null)}/>;
+  return(
+    <div style={{animation:"fu .4s ease"}}>
+      <div style={{marginBottom:20,padding:"20px 18px",borderRadius:12,background:"rgba(60,5,5,.5)",border:"1px solid rgba(200,40,40,.4)",position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.7),transparent)"}}/>
+        <div style={{textAlign:"center",marginBottom:12}}>
+          <div style={{fontSize:26,marginBottom:5}}>⚠️</div>
+          <div className="cinzel" style={{fontSize:10,letterSpacing:4,color:"rgba(240,80,80,1)"}}>MATERIAL SAGRADO — SÓ PARA ESTUDO SÉRIO</div>
+        </div>
+        <div className="garamond" style={{fontSize:14,color:"rgba(220,160,160,.9)",lineHeight:2.1}}>
+          Estudar tarot é um compromisso espiritual. Este material não foi feito para curiosidade vaga — foi feito para quem quer aprender com respeito. O tarot tem poder real. Mexe com energia. Abre portas. Quem brinca com o sagrado, a espiritualidade cobra. Não existe uso leviano do tarot sem consequência para a energia vital de quem usa e de quem é lido.
+        </div>
+        <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.3),transparent)",margin:"12px 0"}}/>
+        <div className="garamond" style={{fontSize:14,color:"rgba(220,160,160,.9)",lineHeight:2.1}}>
+          Nunca use este conhecimento com pessoas em fragilidade emocional ou espiritual sem preparo. Leituras feitas sem proteção e sem equilíbrio podem atrair obsessores — energias que se aproveitam de brechas abertas pelo desequilíbrio. Estude. Prepare-se. Cuide da sua vibração antes de cuidar da do outro.
+        </div>
+        <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.3),transparent)",margin:"12px 0"}}/>
+        <div className="cinzel" style={{fontSize:10,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:8}}>✦ ESTE MATERIAL SÓ TEM VALOR PARA QUEM É CONSAGRADO</div>
+        <div className="garamond" style={{fontSize:14,color:"rgba(220,160,160,.9)",lineHeight:2.1}}>
+          Estudar tarot sem ter espiritualidade desenvolvida é como aprender a tocar um instrumento sem ter ouvido. Você pode decorar as notas — mas a música não vai sair. Para que o conhecimento aqui se transforme em dom real, é preciso ser consagrado, ter guias trabalhados e estar em desenvolvimento espiritual ativo. Sem consagração, este material pode ser um passatempo. Para quem tem a vibração — é um mapa sagrado.
+        </div>
+        <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.5),transparent)",margin:"12px 0"}}/>
+        <div className="cinzel" style={{fontSize:11,letterSpacing:2,color:"rgba(255,60,60,1)",marginBottom:8}}>🚫 JAMAIS USE PARA ENGANAR</div>
+        <div className="garamond" style={{fontSize:15,color:"rgba(240,170,170,.95)",lineHeight:2.1,fontStyle:"italic"}}>
+          Usar o tarot para enganar, manipular, assustar ou tirar vantagem de alguém é uma das piores formas de abuso do sagrado. A espiritualidade vê tudo. O que é feito no nome do sagrado para prejudicar — cobra com juros. Nunca use este conhecimento para enganar ninguém. Jamais.
+        </div>
+        <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.5),transparent)",margin:"14px 0"}}/>
+        <div className="cinzel" style={{fontSize:11,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:10}}>💔 AS PESSOAS VÊM ATÉ NÓS QUANDO ESTÃO VULNERÁVEIS</div>
+        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2}}>
+          Quem busca uma cartomante não está bem. Está com medo. Com o coração partido. Com uma dúvida que não consegue responder sozinho. Com uma esperança que está quase apagando. Eles chegam no momento mais frágil — e é exatamente por isso que a responsabilidade de quem lê é enorme.
+        </div>
+        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2,marginTop:12}}>
+          As palavras têm peso. No sagrado, têm peso dobrado. O que sai da boca de quem lê cartas entra no coração de quem está ouvindo — porque essa pessoa está aberta, receptiva e esperando uma resposta. Ela acredita. Ela confia. E essa confiança é sagrada demais para ser tratada com descuido.
+        </div>
+        <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.3),transparent)",margin:"12px 0"}}/>
+        <div className="garamond" style={{fontSize:16,color:"rgba(250,190,190,.95)",lineHeight:2.1,fontStyle:"italic",textAlign:"center"}}>
+          Cuide das suas palavras como se fossem remédio. Porque para quem está vulnerável — elas são.
+        </div>
+        <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.5),transparent)",margin:"14px 0"}}/>
+        <div className="cinzel" style={{fontSize:11,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:10}}>🔥 NÃO ESTUDE POR EGO</div>
+        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2}}>
+          O ego quer impressionar. Quer ser o que sabe mais. Quer o reconhecimento. Quando o sagrado vira espetáculo — ele perde a força. Se você está aqui para provar algo para alguém ou para ter poder sobre outros — esse não é seu caminho. Estude por amor ao conhecimento. Por vontade de servir. Por respeito ao sagrado.
+        </div>
+        <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.5),transparent)",margin:"14px 0"}}/>
+        <div className="cinzel" style={{fontSize:11,letterSpacing:2,color:"rgba(240,100,100,.9)",marginBottom:10}}>🛡 NÃO SE CONSAGRE SEM PROTEÇÃO E SEM SABER O QUE FAZ</div>
+        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2}}>
+          Consagração não é um ritual que se inventa sozinho. É um compromisso espiritual que exige preparo e a proteção de quem já percorreu esse caminho. Sem a proteção de quem te consagrou — quem tem autoridade espiritual para abrir esse portal com você — você está entrando em terreno perigoso sem armadura.
+        </div>
+        <div className="garamond" style={{fontSize:15,color:"rgba(220,160,160,.9)",lineHeight:2.2,marginTop:12}}>
+          Busque quem sabe. Busque quem já foi pelo caminho. A humildade de aprender com quem chegou antes é parte da consagração. Saiba o que você está fazendo. Saiba com quem aprendeu. Saiba quem te protege.
+        </div>
+        <div style={{width:"100%",height:1,background:"linear-gradient(90deg,transparent,rgba(200,40,40,.3),transparent)",margin:"12px 0"}}/>
+        <div className="garamond" style={{fontSize:16,color:"rgba(250,190,190,.95)",lineHeight:2.1,fontStyle:"italic",textAlign:"center"}}>
+          Sem isso — não comece.
+        </div>
+        </div>
+      </div>
+      <div className="cinzel" style={{fontSize:9,letterSpacing:4,color:E.purpleDim,marginBottom:12,textAlign:"center"}}>✦ FUNDAMENTOS — LEIA ANTES DE TUDO ✦</div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:8}}>
+        {FUNDAMENTOS.map(f=><FundamentoCard key={f.id} f={f} onClick={()=>setSel(f)}/>)}
+      </div>
+    </div>
+  );
+}
+
+// ── TAB ARCANOS (ESTUDO) ──────────────────────────────────────────
+function TabArcanos(){
+  const[q,setQ]=useState("");const[fil,setFil]=useState("todos");
+  const[sel,setSel]=useState(null);const[tab,setTab]=useState("estudo");
+  const fs=[["todos","Todas"],["maior","Maiores"],["paus","Paus"],["copas","Copas"],["espadas","Espadas"],["ouros","Ouros"]];
+  const list=ALL.filter(c=>{
+    if(fil==="maior"&&c.type!=="maior")return false;
+    if(["paus","copas","espadas","ouros"].includes(fil)&&c.suit?.toLowerCase()!==fil)return false;
+    if(q)return c.name.toLowerCase().includes(q.toLowerCase());
+    return true;
+  }).slice(0,78);
+
+  if(sel)return <DetalheEstudo card={sel} onClose={()=>setSel(null)}/>;
+  return(
+    <div style={{animation:"fu .4s ease"}}>
+      <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar arcano…"
+        style={{width:"100%",background:"rgba(8,5,15,.95)",border:`1px solid ${E.border}`,borderRadius:10,padding:"11px 15px",color:E.text,fontSize:15,outline:"none",marginBottom:10}}/>
+      <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:14}}>
+        {fs.map(([k,l])=><button key={k} onClick={()=>setFil(k)} className="cinzel" style={{padding:"4px 10px",borderRadius:14,border:`1px solid ${fil===k?E.purpleBr:E.border}`,background:fil===k?"rgba(123,95,160,.12)":"transparent",color:fil===k?E.purpleBr:E.textDim,fontSize:9,letterSpacing:1}}>{l}</button>)}
+      </div>
+      {!q&&fil==="todos"?(
+        <div style={{textAlign:"center",padding:"40px 0"}}>
+          <div style={{fontSize:48,marginBottom:12,animation:"fl 3s ease-in-out infinite"}}>🌙</div>
+          <div className="cinzel" style={{fontSize:10,letterSpacing:4,color:E.purpleDim}}>78 ARCANOS PARA ESTUDAR</div>
+          <div className="garamond" style={{marginTop:6,fontSize:13,color:E.textDim,fontStyle:"italic"}}>Busque por nome ou filtre por tipo</div>
+        </div>
+      ):(
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:6}}>
+          {list.map(c=>{
+            const[c1,c2]=c.cols||["#100c04","#1c1408"];
+            return(
+              <div key={c.id} onClick={()=>setSel(c)} style={{padding:"9px 12px",borderRadius:9,border:`1px solid ${E.border}`,background:E.panel,display:"flex",alignItems:"center",gap:10,cursor:"pointer",transition:"all .15s",position:"relative",overflow:"hidden"}}
+                onMouseEnter={e=>e.currentTarget.style.borderColor=E.purpleBr}
+                onMouseLeave={e=>e.currentTarget.style.borderColor=E.border}>
+                <div style={{position:"absolute",top:0,left:0,bottom:0,width:2,background:`linear-gradient(180deg,transparent,${E.deep},transparent)`,opacity:.4}}/>
+                <div style={{width:32,height:32,borderRadius:7,background:`linear-gradient(135deg,${c1},${c2})`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,border:`1px solid ${E.deepDim}`,marginLeft:6,fontSize:15}}>{c.sym}</div>
+                <div style={{flex:1}}>
+                  <div className="cinzel" style={{fontSize:11,color:E.purplePale}}>{c.name}</div>
+                  <div className="garamond" style={{fontSize:10,color:E.textDim,marginTop:1,fontStyle:"italic"}}>{c.essence?.slice(0,55)}…</div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
+                  <div style={{width:6,height:6,borderRadius:"50%",background:c.move?E.purpleBr:E.textFaint}}/>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── DETALHE ESTUDO DE CADA CARTA ──────────────────────────────────
+function DetalheEstudo({card,onClose}){
+  const[aba,setAba]=useState("info");
+  const[respIntuitiva,setRespIntuitiva]=useState("");
+  const[feedbackIA,setFeedbackIA]=useState("");
+  const[loadingFB,setLoadingFB]=useState(false);
+  const[perguntaAtual,setPerguntaAtual]=useState(0);
+  const[respostas,setRespostas]=useState({});
+  const[resp,setResp]=useState("");
+  const[c1,c2]=card.cols||["#100c04","#1c1408"];
+
+  const perguntasIntuicao=[
+    {p:"Olhe para esta carta. Sem pensar, o que você vê?",d:"Descreva as imagens, cores, figuras que mais chamam sua atenção."},
+    {p:"Que emoção essa carta desperta em você?",d:"Pode ser uma palavra, uma sensação no corpo, uma memória."},
+    {p:card.move?"Esta carta parece estar em movimento? O que está se movendo?":"Esta carta parece parada. O que está esperando?",d:card.move?"Observe o dinamismo, as figuras em ação, as linhas.":"Observe a quietude, o que está consolidado, o que aguarda."},
+    {p:`O elemento desta carta é ${card.el}. Você sente esse elemento nela? Como?`,d:`${card.el==="Fogo"?"Sente calor, urgência, criação?":card.el==="Água"?"Sente fluidez, profundidade, emoção?":card.el==="Ar"?"Sente clareza, movimento, pensamento?":"Sente solidez, peso, praticidade?"}`},
+    {p:"Se essa carta fosse uma mensagem direta para alguém que você conhece, qual seria?",d:"Não pense no significado — apenas deixe a mensagem surgir."},
+  ];
+
+  async function avaliarResposta(){
+    if(!resp.trim())return;
+    setLoadingFB(true);setFeedbackIA("");
+    const key=window._LUNALVA_KEY||(localStorage.getItem("lunalva_key")||"");
+    if(!key){setFeedbackIA("⚠️ Configure a chave API para receber feedback da IA.");setLoadingFB(false);return;}
+    try{
+      const r=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,
+          system:"Você é um professor de Tarot sábio e acolhedor. Dê feedback construtivo, valide a intuição do estudante, corrija gentilmente onde necessário e aprofunde o aprendizado. Seja humano e encorajador. Sem asteriscos.",
+          messages:[{role:"user",content:`Carta: ${card.name} (${card.el}, ${card.ml})\nEssência: ${card.essence}\n\nPergunta feita ao estudante: "${perguntasIntuicao[perguntaAtual].p}"\n\nResposta do estudante: "${resp}"\n\nDê feedback construtivo de até 4 parágrafos. Valide o que ele acertou intuitivamente, corrija gentilmente o que diverge do significado real, e explique como a intuição dele se conecta (ou não) com o significado tradicional da carta.`}]})
+      });
+      const d=await r.json();
+      setFeedbackIA(d.content?.[0]?.text||"Erro ao gerar feedback.");
+      setRespostas(prev=>({...prev,[perguntaAtual]:resp}));
+    }catch{setFeedbackIA("Erro de conexão. Tente novamente.");}
+    setLoadingFB(false);
+  }
+
+  function proximaPergunta(){
+    setResp("");setFeedbackIA("");
+    if(perguntaAtual<perguntasIntuicao.length-1)setPerguntaAtual(p=>p+1);
+  }
+
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:500,background:E.bg,overflowY:"auto",padding:"16px 16px 30px"}}>
+      <div style={{position:"fixed",left:0,top:0,bottom:0,width:3,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`,opacity:.8}}/>
+      <div style={{position:"fixed",right:0,top:0,bottom:0,width:3,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`,opacity:.8}}/>
+      <div style={{maxWidth:560,margin:"0 auto",animation:"fu .4s ease"}}>
+
+        {/* Card visual — igual ao Arcana */}
+        <div style={{width:"100%",borderRadius:14,overflow:"hidden",background:`linear-gradient(160deg,${c1} 0%,${c2} 60%,${c1} 100%)`,border:`1px solid ${E.goldBr}`,animation:"cr .5s ease",position:"relative",padding:"24px 20px 20px"}}>
+          <div style={{position:"absolute",inset:0,background:"linear-gradient(160deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,.4) 100%)"}}/>
+          <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${E.gold},${E.purplePale},${E.gold},transparent)`}}/>
+          <div style={{position:"absolute",bottom:0,left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${E.deep},transparent)`}}/>
+          <div style={{position:"absolute",top:0,left:0,bottom:0,width:2,background:`linear-gradient(180deg,transparent,${E.deep},${E.gold},${E.deep},transparent)`}}/>
+          <div style={{position:"absolute",top:0,right:0,bottom:0,width:2,background:`linear-gradient(180deg,transparent,${E.deep},${E.gold},${E.deep},transparent)`}}/>
+          {[{top:8,left:8},{top:8,right:8},{bottom:8,left:8},{bottom:8,right:8}].map((pos,i)=>(
+            <svg key={i} viewBox="0 0 16 16" width={16} height={16} style={{position:"absolute",...pos,opacity:.6,zIndex:2}}>
+              <path d={i<2?"M0,14 L0,0 L14,0":"M0,2 L0,16 L14,16"} fill="none" stroke={E.goldBr} strokeWidth="1.2"/>
+            </svg>
+          ))}
+          <div style={{position:"relative",zIndex:1,textAlign:"center"}}>
+            {card.num&&<div className="cinzel" style={{fontSize:9,letterSpacing:5,color:E.purpleDim,marginBottom:6}}>{card.num}</div>}
+            <div style={{fontSize:52,marginBottom:10,filter:`drop-shadow(0 0 14px ${E.goldBr})`,animation:"fl 3.5s ease-in-out infinite"}}>{card.sym}</div>
+            <div className="cinzel" style={{fontSize:18,color:E.purplePale,letterSpacing:3,marginBottom:5,textShadow:`0 0 25px ${E.gold}`}}>{card.name}</div>
+            <div style={{width:55,height:1,background:`linear-gradient(90deg,transparent,${E.purpleDim},transparent)`,margin:"8px auto"}}/>
+            <div className="cinzel" style={{fontSize:9,letterSpacing:2,color:E.textDim,marginBottom:6}}>{card.el}{card.planet?` · ${card.planet}`:""}</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center"}}>
+              <div style={{display:"inline-flex",alignItems:"center",gap:5,padding:"3px 12px",borderRadius:10,border:`1px solid ${E.deepDim}`,background:"rgba(0,0,0,.45)"}}>
+                <div style={{width:6,height:6,borderRadius:"50%",background:card.move?E.goldBr:E.textFaint}}/>
+                <span className="cinzel" style={{fontSize:8,letterSpacing:2,color:card.move?E.purpleDim:E.textFaint}}>{card.ml||"—"}</span>
+              </div>
+              {card.el&&<div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:10,border:`1px solid ${E.deepDim}`,background:"rgba(0,0,0,.35)"}}>
+                <span style={{fontSize:11}}>{card.el==="Fogo"?"🜂":card.el==="Água"?"🜄":card.el==="Ar"?"🜁":"🜃"}</span>
+                <span className="cinzel" style={{fontSize:8,letterSpacing:1,color:E.textDim}}>{card.el}</span>
+              </div>}
+            </div>
+          </div>
+        </div>
+
+        {/* Abas */}
+        <div style={{display:"flex",gap:0,marginTop:10,borderRadius:8,overflow:"hidden",border:`1px solid ${E.border}`}}>
+          {[["info","📖 Estudo"],["intuicao","👁 Intuição"]].map(([k,l])=>(
+            <button key={k} onClick={()=>setAba(k)} className="cinzel" style={{flex:1,padding:"9px 4px",border:"none",background:aba===k?"rgba(123,95,160,.15)":"transparent",color:aba===k?E.purplePale:E.textDim,fontSize:10,letterSpacing:1,borderBottom:aba===k?`2px solid ${E.purpleBr}`:"2px solid transparent"}}>
+              {l}
+            </button>
+          ))}
+        </div>
+
+        {aba==="info"&&(
+          <div style={{marginTop:10}}>
+            {/* Essência */}
+            <Panel style={{padding:"14px 16px"}}>
+              <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:7}}>ESSÊNCIA</div>
+              <p className="garamond" style={{color:E.text,fontSize:14,fontStyle:"italic",lineHeight:1.9}}>{card.essence}</p>
+              <div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:4}}>
+                {card.kw?.split("·").map((k,i)=><span key={i} className="cinzel" style={{padding:"2px 7px",borderRadius:10,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`,fontSize:8,color:E.purpleDim,letterSpacing:1}}>{k.trim()}</span>)}
+              </div>
+            </Panel>
+
+            {/* Atributos */}
+            <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(8,5,15,.95)"}}>
+              <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:12}}>ATRIBUTOS SAGRADOS</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                <div style={{padding:"10px 11px",borderRadius:8,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`}}>
+                  <div className="cinzel" style={{fontSize:7,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>ELEMENTO</div>
+                  <div style={{fontSize:16,marginBottom:2}}>{card.el==="Fogo"?"🜂":card.el==="Água"?"🜄":card.el==="Ar"?"🜁":"🜃"}</div>
+                  <div className="cinzel" style={{fontSize:10,color:E.purple,marginBottom:2}}>{card.el}</div>
+                  <div className="garamond" style={{fontSize:10,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>{card.el==="Fogo"?"Ação, paixão, criação":card.el==="Água"?"Emoção, intuição, amor":card.el==="Ar"?"Mente, comunicação":"Matéria, dinheiro, corpo"}</div>
+                </div>
+                <div style={{padding:"10px 11px",borderRadius:8,background:card.move?"rgba(123,95,160,.1)":"rgba(20,15,30,.5)",border:`1px solid ${card.move?E.purpleBr:E.textFaint}`}}>
+                  <div className="cinzel" style={{fontSize:7,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>ENERGIA</div>
+                  <div style={{fontSize:16,marginBottom:2}}>{card.move?"⚡":"◉"}</div>
+                  <div className="cinzel" style={{fontSize:10,color:card.move?E.purple:E.textDim,marginBottom:2}}>{card.move?"MOVIMENTO":"ESTASE"}</div>
+                  <div className="garamond" style={{fontSize:10,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>{card.move?"Algo está em movimento.":"Pausa e reflexão."}</div>
+                </div>
+                {card.type==="maior"&&card.num&&(
+                  <div style={{padding:"10px 11px",borderRadius:8,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`}}>
+                    <div className="cinzel" style={{fontSize:7,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>NUMEROLOGIA</div>
+                    <div className="cinzel" style={{fontSize:16,color:E.purple,marginBottom:2}}>{card.num}</div>
+                    <div className="garamond" style={{fontSize:10,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>
+                      {{"0":"Potencial infinito","I":"Iniciação. Força criadora","II":"Dualidade. Equilíbrio","III":"Expressão. Criatividade","IV":"Estrutura. Estabilidade","V":"Mudança. Liberdade","VI":"Harmonia. União","VII":"Movimento. Fé","VIII":"Poder. Infinito","IX":"Conclusão. Sabedoria","X":"Ciclos. Completude","XI":"Causa e efeito","XII":"Rendição. Nova visão","XIII":"Transformação","XIV":"Alquimia. Paciência","XV":"Matéria. Ilusão","XVI":"Ruptura. Revelação","XVII":"Esperança. Renovação","XVIII":"Ciclos. Intuição","XIX":"Luz. Alegria total","XX":"Despertar. Chamado","XXI":"Totalidade. Realização"}[card.num]||""}
+                    </div>
+                  </div>
+                )}
+                {card.planet&&(
+                  <div style={{padding:"10px 11px",borderRadius:8,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`}}>
+                    <div className="cinzel" style={{fontSize:7,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>ASTRO REGENTE</div>
+                    <div style={{fontSize:16,marginBottom:2}}>✦</div>
+                    <div className="cinzel" style={{fontSize:10,color:E.purple,marginBottom:2}}>{card.planet}</div>
+                    <div className="garamond" style={{fontSize:10,color:E.textDim,fontStyle:"italic",lineHeight:1.4}}>Influência planetária</div>
+                  </div>
+                )}
+              </div>
+            </Panel>
+
+            {/* Simbolismo e Ensinamento — só maiores */}
+            {card.type==="maior"&&card.simbolismo&&(
+              <Panel style={{marginTop:8,padding:"14px 16px"}}>
+                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:7}}>SIMBOLISMO</div>
+                <p className="garamond" style={{color:E.text,fontSize:13,lineHeight:1.9}}>{card.simbolismo}</p>
+              </Panel>
+            )}
+            {card.type==="maior"&&card.ensinamento&&(
+              <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(60,40,80,.2)",borderColor:"rgba(123,95,160,.3)"}}>
+                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleBr,marginBottom:7}}>✦ ENSINAMENTO CENTRAL</div>
+                <p className="garamond" style={{color:E.purplePale,fontSize:14,fontStyle:"italic",lineHeight:1.9}}>{card.ensinamento}</p>
+              </Panel>
+            )}
+            {card.type==="menor"&&card.ensinamento&&(
+              <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(60,40,80,.2)",borderColor:"rgba(123,95,160,.3)"}}>
+                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleBr,marginBottom:7}}>✦ ENSINAMENTO DO NAIPE</div>
+                <p className="garamond" style={{color:E.purplePale,fontSize:14,fontStyle:"italic",lineHeight:1.9}}>{card.ensinamento}</p>
+              </Panel>
+            )}
+
+            {/* Cores */}
+            {card.cores&&(
+              <Panel style={{marginTop:8,padding:"14px 16px"}}>
+                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:6}}>CORES E SIMBOLISMO VISUAL</div>
+                <p className="garamond" style={{color:E.text,fontSize:13,fontStyle:"italic",lineHeight:1.8}}>{card.cores}</p>
+              </Panel>
+            )}
+
+            {/* Direto e Invertido */}
+            <Panel style={{marginTop:8,padding:"14px 16px"}}>
+              <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:E.purpleDim,marginBottom:8}}>QUANDO APARECE DIRETA</div>
+              <p className="garamond" style={{color:E.text,fontSize:13,lineHeight:1.85}}>{card.d?.g}</p>
+            </Panel>
+            <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(80,10,10,.3)",borderColor:"rgba(160,40,40,.25)"}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:7}}>
+                <span style={{fontSize:13,color:"rgba(200,80,80,.55)"}}>↕</span>
+                <div className="cinzel" style={{fontSize:8,letterSpacing:4,color:"rgba(200,80,80,.55)"}}>QUANDO APARECE INVERTIDA</div>
+              </div>
+              <p className="garamond" style={{color:"rgba(220,160,160,.72)",fontSize:13,fontStyle:"italic",lineHeight:1.85}}>{card.r?.g}</p>
+            </Panel>
+          </div>
+        )}
+
+        {aba==="intuicao"&&(
+          <div style={{marginTop:10}}>
+            <Panel style={{padding:"13px 15px",background:"rgba(60,40,80,.15)",borderColor:"rgba(123,95,160,.3)",marginBottom:10}}>
+              <div className="cinzel" style={{fontSize:8,letterSpacing:3,color:E.purpleBr,marginBottom:6}}>👁 EXERCÍCIO DE INTUIÇÃO</div>
+              <div className="garamond" style={{fontSize:13,color:E.text,lineHeight:1.8,fontStyle:"italic"}}>
+                Olhe para a carta acima. Não pense no significado que aprendeu. Apenas sinta. Responda com honestidade — não há resposta errada. A intuição é a sua ferramenta mais poderosa.
+              </div>
+            </Panel>
+
+            <div style={{marginBottom:8}}>
+              <div style={{display:"flex",gap:3,marginBottom:10}}>
+                {perguntasIntuicao.map((_,i)=>(
+                  <div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=perguntaAtual?E.purpleBr:E.deepDim}}/>
+                ))}
+              </div>
+              <div className="cinzel" style={{fontSize:8,letterSpacing:2,color:E.purpleDim,marginBottom:3}}>PERGUNTA {perguntaAtual+1} DE {perguntasIntuicao.length}</div>
+            </div>
+
+            <Panel style={{padding:"16px 16px"}}>
+              <p className="cinzel" style={{fontSize:13,color:E.purplePale,lineHeight:1.7,marginBottom:6}}>{perguntasIntuicao[perguntaAtual].p}</p>
+              <p className="garamond" style={{fontSize:12,color:E.textDim,fontStyle:"italic",marginBottom:12}}>{perguntasIntuicao[perguntaAtual].d}</p>
+              <textarea value={resp} onChange={e=>setResp(e.target.value)} placeholder="Escreva sua resposta aqui…" rows={4}
+                style={{width:"100%",background:"rgba(8,5,15,.8)",border:`1px solid ${E.deepDim}`,borderRadius:8,padding:"10px 12px",color:E.text,fontSize:14,outline:"none",resize:"vertical",lineHeight:1.7}}/>
+              <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
+                <button onClick={avaliarResposta} disabled={!resp.trim()||loadingFB} className="cinzel"
+                  style={{padding:"10px 22px",borderRadius:8,border:`1px solid ${E.purpleBr}`,background:"rgba(123,95,160,.1)",color:E.purplePale,fontSize:10,letterSpacing:2,cursor:"pointer"}}>
+                  {loadingFB?"⟳ AVALIANDO…":"✦ RECEBER FEEDBACK DA IA"}
+                </button>
+              </div>
+            </Panel>
+
+            {feedbackIA&&(
+              <Panel style={{marginTop:10,padding:"15px 16px",background:"rgba(40,30,60,.3)",borderColor:"rgba(123,95,160,.35)"}}>
+                <div className="cinzel" style={{fontSize:8,letterSpacing:3,color:E.purpleBr,marginBottom:8}}>✦ FEEDBACK</div>
+                <div className="garamond" style={{color:E.text,fontSize:14,lineHeight:2,whiteSpace:"pre-line"}}>{feedbackIA}</div>
+                {perguntaAtual<perguntasIntuicao.length-1&&(
+                  <div style={{textAlign:"center",marginTop:12}}>
+                    <button onClick={proximaPergunta} className="cinzel" style={{padding:"9px 20px",borderRadius:8,border:`1px solid ${E.border}`,background:"transparent",color:E.textDim,fontSize:9,letterSpacing:2,cursor:"pointer"}}>PRÓXIMA PERGUNTA ›</button>
+                  </div>
+                )}
+                {perguntaAtual===perguntasIntuicao.length-1&&(
+                  <div style={{marginTop:12,textAlign:"center"}}>
+                    <div className="cinzel" style={{fontSize:9,color:E.purplePale,letterSpacing:2}}>✦ EXERCÍCIO CONCLUÍDO ✦</div>
+                    <div className="garamond" style={{fontSize:12,color:E.textDim,fontStyle:"italic",marginTop:4}}>Você completou o exercício intuitivo desta carta.</div>
+                  </div>
+                )}
+              </Panel>
+            )}
+          </div>
+        )}
+
+        <div style={{textAlign:"center",marginTop:16}}>
+          <button onClick={onClose} className="cinzel" style={{background:"transparent",border:`1px solid ${E.border}`,borderRadius:8,padding:"9px 24px",color:E.textDim,fontSize:10,letterSpacing:3,cursor:"pointer"}}>VOLTAR</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── APP ESTUDO ────────────────────────────────────────────────────
+const TABS_E=[{id:"fund",icon:"📚",l:"Fundamentos"},{id:"arcanos",icon:"🌙",l:"Arcanos"}];
+
+function App(){
+  const[tab,setTab]=useState("fund");
+  const[showKey,setShowKey]=useState(false);
+  const[apiKey,setApiKey]=useState(()=>localStorage.getItem("lunalva_key")||"");
+
+  useEffect(()=>{
+    const k=localStorage.getItem("lunalva_key")||"";
+    if(k){window._LUNALVA_KEY=k;setApiKey(k);}
+  },[]);
+
+  function salvarKey(k){
+    setApiKey(k);window._LUNALVA_KEY=k;localStorage.setItem("lunalva_key",k);
+    setShowKey(false);alert("✅ Chave salva!");
+  }
+
+  return(
+    <div style={{minHeight:"100vh",background:E.bg,position:"relative",overflowX:"hidden",fontFamily:"'EB Garamond',serif"}}>
+      <Stars/>
+      <SideBars/>
+      <div style={{position:"fixed",top:"10%",left:"-5%",width:"40vw",height:"35vh",borderRadius:"50%",background:"radial-gradient(circle,rgba(61,40,96,.06) 0%,transparent 70%)",pointerEvents:"none",zIndex:0}}/>
+      <div style={{position:"fixed",bottom:"10%",right:"-5%",width:"35vw",height:"30vh",borderRadius:"50%",background:"radial-gradient(circle,rgba(123,95,160,.04) 0%,transparent 70%)",pointerEvents:"none",zIndex:0}}/>
+
+      <div style={{position:"relative",zIndex:1,maxWidth:580,margin:"0 auto",padding:"0 18px 80px"}}>
+
+        {/* Chave API */}
+        <div style={{position:"relative",paddingTop:12}}>
+          <button onClick={()=>setShowKey(s=>!s)} style={{position:"absolute",top:12,right:0,background:"transparent",border:`1px solid ${apiKey?E.deepDim:"rgba(200,80,60,.4)"}`,borderRadius:8,padding:"4px 10px",color:apiKey?E.textFaint:"rgba(220,100,80,.8)",fontFamily:"'Cinzel',serif",fontSize:8,letterSpacing:2,cursor:"pointer"}}>
+            {apiKey?"⚙ API OK":"⚠ CONFIG API"}
+          </button>
+          {showKey&&(
+            <div style={{background:E.panel,border:`1px solid ${E.border}`,borderRadius:10,padding:"14px 16px",marginTop:40}}>
+              <div className="cinzel" style={{fontSize:8,letterSpacing:3,color:E.purpleDim,marginBottom:8}}>CHAVE ANTHROPIC API</div>
+              <div style={{display:"flex",gap:8}}>
+                <input value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder="sk-ant-..." type="password"
+                  style={{flex:1,background:"rgba(5,3,10,.9)",border:`1px solid ${E.deepDim}`,borderRadius:7,padding:"9px 12px",color:E.text,fontSize:13,outline:"none"}}/>
+                <button onClick={()=>salvarKey(apiKey)} className="cinzel"
+                  style={{background:"rgba(123,95,160,.15)",border:`1px solid ${E.purpleBr}`,borderRadius:7,padding:"9px 16px",color:E.purpleBr,fontSize:9,letterSpacing:2,cursor:"pointer"}}>SALVAR</button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Header */}
+        <div style={{textAlign:"center",padding:"24px 0 20px"}}>
+          <div className="cinzel" style={{fontSize:8,letterSpacing:8,color:E.purpleDim,marginBottom:8,animation:"sh 3s ease-in-out infinite"}}>✦ ESCOLA DO ARCANO ✦</div>
+          <div style={{fontSize:44,marginBottom:8,animation:"eyePulse 4s ease-in-out infinite"}}>🌙</div>
+          <h1 className="gothic" style={{fontSize:"clamp(26px,7vw,42px)",color:E.purplePale,letterSpacing:4,marginBottom:4,textShadow:`0 0 30px rgba(123,95,160,.5)`}}>
+            Lunalva Estudo
+          </h1>
+          <p className="gothic" style={{fontSize:"clamp(12px,3.5vw,17px)",color:E.purple,letterSpacing:2,marginBottom:10,opacity:.85,fontStyle:"italic"}}>
+            O caminho começa pelo conhecimento
+          </p>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:6}}>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${E.deep})`}}/>
+            <div style={{color:E.purpleDim,fontSize:16}}>✦</div>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,${E.deep},transparent)`}}/>
+          </div>
+          <p className="cinzel" style={{fontSize:8,letterSpacing:3,color:E.textDim}}>FUNDAMENTOS · 78 ARCANOS · EXERCÍCIOS DE INTUIÇÃO</p>
+        </div>
+
+        {/* Tabs */}
+        <Panel style={{padding:4,marginBottom:20,background:"transparent"}}>
+          {TABS_E.map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)} className="cinzel" style={{width:"50%",padding:"9px 4px",borderRadius:8,border:"none",background:tab===t.id?"rgba(123,95,160,.11)":"transparent",color:tab===t.id?E.purple:E.textDim,fontSize:"clamp(9px,2.5vw,11px)",letterSpacing:1.5,transition:"all .2s",cursor:"pointer",borderBottom:tab===t.id?`1px solid ${E.purpleBr}`:"1px solid transparent"}}>
+              <div style={{marginBottom:2,fontSize:14}}>{t.icon}</div>
+              <div>{t.l}</div>
+            </button>
+          ))}
+        </Panel>
+
+        {tab==="fund"&&<TabFundamentos/>}
+        {tab==="arcanos"&&<TabArcanos/>}
+
+        {/* Footer */}
+        <div style={{textAlign:"center",marginTop:40}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:7}}>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,transparent,${E.deep})`}}/>
+            <div style={{color:E.purpleDim,fontSize:14}}>🌙</div>
+            <div style={{flex:1,height:1,background:`linear-gradient(90deg,${E.deep},transparent)`}}/>
+          </div>
+          <div className="cinzel" style={{fontSize:7,letterSpacing:3,color:E.textFaint}}>✦ LUNALVA ESTUDO · MATERIAL SAGRADO ✦</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
