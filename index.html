@@ -8,129 +8,209 @@
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#060503;min-height:100vh;overflow-x:hidden;font-family:'EB Garamond',serif}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:2px}
+body{background:#08060a;min-height:100vh;overflow-x:hidden;font-family:'EB Garamond',serif;color:#e8dcc8}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.35);border-radius:4px}
 .gothic{font-family:'UnifrakturMaguntia',cursive}
 .cinzel{font-family:'Cinzel',serif}
-@keyframes tw{from{opacity:.04;transform:scale(.4)}to{opacity:.85;transform:scale(1.7)}}
-@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes sh{0%,100%{opacity:.3}60%{opacity:1}}
-@keyframes eyePulse{0%,100%{opacity:.7}50%{opacity:1}}
-@keyframes gl{0%,100%{box-shadow:0 0 18px rgba(201,168,76,.15)}50%{box-shadow:0 0 50px rgba(201,168,76,.4)}}
+
+/* Textured background */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(140,50,50,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(201,168,76,.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(60,80,60,.05) 0%, transparent 60%);
+}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5c5 8 15 12 25 12-5 8-8 18-5 28-8-3-18-3-25 2-7-5-17-5-25-2 3-10 0-20-5-28 10 0 20-4 25-12z' fill='none' stroke='%23c9a84c' stroke-width='.5' opacity='.4'/%3E%3C/svg%3E");
+}
+
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes breathe{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.02)}}
+@keyframes borderGlow{0%,100%{opacity:.5}50%{opacity:1}}
+
 .stars{position:fixed;inset:0;pointer-events:none;z-index:0}
 .star{position:absolute;border-radius:50%}
-.sidebar{position:fixed;top:0;bottom:0;width:4px;z-index:20;background:linear-gradient(180deg,transparent 0%,#7a6230 15%,#c9a84c 45%,#d4b85c 55%,#7a6230 85%,transparent 100%);opacity:.85}
-.container{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 24px 60px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.card{position:relative;width:100%;max-width:480px;background:#0c0a06;border:1px solid rgba(201,168,76,.3);border-radius:18px;padding:clamp(32px,7vw,50px) clamp(24px,5.5vw,40px);overflow:hidden;cursor:pointer;transition:all .35s;text-decoration:none;display:block;margin-bottom:24px;animation:gl 4s ease-in-out infinite}
-.card:hover{transform:translateY(-8px);border-color:rgba(212,184,92,.65);box-shadow:0 0 55px rgba(201,168,76,.35)}
-.card-line-top{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#c9a84c,#e0c878,#c9a84c,transparent)}
-.card-line-bot{position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#7a6230,transparent)}
-.card-line-l{position:absolute;top:0;left:0;bottom:0;width:2px;background:linear-gradient(180deg,transparent,#7a6230,#c9a84c,#7a6230,transparent)}
-.card-line-r{position:absolute;top:0;right:0;bottom:0;width:2px;background:linear-gradient(180deg,transparent,#7a6230,#c9a84c,#7a6230,transparent)}
-.glow1{position:fixed;top:8%;left:-8%;width:45vw;height:40vh;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.09) 0%,transparent 70%);pointer-events:none;z-index:0}
-.glow2{position:fixed;bottom:8%;right:-8%;width:40vw;height:35vh;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.07) 0%,transparent 70%);pointer-events:none;z-index:0}
+
+/* Ornamental sidebars */
+.sidebar{position:fixed;top:0;bottom:0;width:1px;z-index:20;opacity:.5}
+.sidebar-inner{position:fixed;top:10%;bottom:10%;width:1px;z-index:20;
+  background:linear-gradient(180deg,transparent,#7a5a2a 20%,#c9a84c 50%,#7a5a2a 80%,transparent)}
+
+.container{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:40px 24px 80px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* Modern luxury card */
+.card{
+  position:relative;width:100%;max-width:500px;
+  background:linear-gradient(165deg, rgba(18,14,10,.95) 0%, rgba(12,10,8,.98) 100%);
+  border-radius:16px;
+  padding:clamp(32px,7vw,48px) clamp(28px,6vw,40px);
+  cursor:pointer;transition:all .4s cubic-bezier(.25,.8,.25,1);
+  text-decoration:none;display:block;margin-bottom:28px;
+  box-shadow:0 4px 20px rgba(0,0,0,.4), 0 1px 0 rgba(201,168,76,.15) inset;
+  border:1px solid rgba(201,168,76,.18);
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 40px rgba(0,0,0,.5), 0 0 30px rgba(201,168,76,.12), 0 1px 0 rgba(201,168,76,.25) inset;
+  border-color:rgba(201,168,76,.35);
+}
+/* Top ornamental line */
+.card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,.5),rgba(224,200,120,.7),rgba(201,168,76,.5),transparent);
+  animation:borderGlow 4s ease-in-out infinite}
+/* Bottom ornamental line */
+.card::after{content:'';position:absolute;bottom:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,.25),transparent)}
+
+/* Corner ornaments */
+.corner{position:absolute;width:20px;height:20px;opacity:.4}
+.corner svg{width:100%;height:100%}
+.corner-tl{top:8px;left:8px}
+.corner-tr{top:8px;right:8px;transform:scaleX(-1)}
+.corner-bl{bottom:8px;left:8px;transform:scaleY(-1)}
+.corner-br{bottom:8px;right:8px;transform:scale(-1)}
+
+.glow1{position:fixed;top:5%;left:-10%;width:50vw;height:45vh;border-radius:50%;background:radial-gradient(circle,rgba(140,50,50,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+.glow2{position:fixed;bottom:5%;right:-10%;width:45vw;height:40vh;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+
+/* Ornamental divider */
+.divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:8px 0}
+.divider-line{flex:1;max-width:90px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.35))}
+.divider-line-r{flex:1;max-width:90px;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.35),transparent)}
+
+/* WhatsApp card accent */
+.card-wpp{border-color:rgba(80,160,80,.25)}
+.card-wpp::before{background:linear-gradient(90deg,transparent,rgba(80,160,80,.4),rgba(120,200,100,.6),rgba(80,160,80,.4),transparent)}
+.card-wpp:hover{border-color:rgba(80,160,80,.4);box-shadow:0 12px 40px rgba(0,0,0,.5), 0 0 25px rgba(80,160,80,.08)}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:24px;
+  border:1px solid rgba(201,168,76,.2);background:rgba(201,168,76,.05);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);margin-top:18px}
+.badge-wpp{border-color:rgba(80,160,80,.25);background:rgba(80,160,80,.06)}
+
 @media(max-width:480px){
-  .card{padding:28px 20px}
+  .card{padding:28px 22px;border-radius:14px}
 }
 </style>
 </head>
 <body>
 
 <div class="stars" id="stars"></div>
-<div class="sidebar" style="left:0"></div>
-<div class="sidebar" style="right:0"></div>
+<div class="sidebar" style="left:20px"></div>
+<div class="sidebar-inner" style="left:20px"></div>
+<div class="sidebar" style="right:20px"></div>
+<div class="sidebar-inner" style="right:20px"></div>
 <div class="glow1"></div>
 <div class="glow2"></div>
 
 <div class="container">
 
-  <div style="text-align:center;margin-bottom:clamp(36px,9vw,56px);animation:fu .6s ease">
-    <div class="cinzel" style="font-size:clamp(11px,2.5vw,14px);letter-spacing:8px;color:rgba(201,168,76,.75);margin-bottom:14px;animation:sh 3s ease-in-out infinite">PORTAL SAGRADO</div>
-    <div style="font-size:clamp(60px,16vw,82px);margin-bottom:12px;animation:eyePulse 4s ease-in-out infinite">&#128301;</div>
-    <h1 class="gothic" style="font-size:clamp(44px,12vw,74px);color:#e0c878;letter-spacing:6px;margin-bottom:8px;text-shadow:0 0 45px rgba(201,168,76,.6)">Lunalva</h1>
-    <p class="gothic" style="font-size:clamp(18px,5vw,26px);color:#d4b85c;letter-spacing:4px;opacity:.92;font-style:italic">Tarot Sagrado</p>
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:20px">
-      <div style="flex:1;max-width:100px;height:1px;background:linear-gradient(90deg,transparent,#7a6230)"></div>
-      <div style="color:rgba(201,168,76,.75);font-size:22px">&#10022;</div>
-      <div style="flex:1;max-width:100px;height:1px;background:linear-gradient(90deg,#7a6230,transparent)"></div>
+  <!-- Header -->
+  <div style="text-align:center;margin-bottom:clamp(40px,10vw,64px);animation:fadeUp .7s ease">
+    <div class="cinzel" style="font-size:clamp(10px,2.5vw,12px);letter-spacing:10px;color:rgba(212,184,92,.85);margin-bottom:18px;animation:shimmer 4s ease-in-out infinite;text-transform:uppercase">Portal Sagrado</div>
+    <div style="font-size:clamp(52px,14vw,72px);margin-bottom:8px;filter:drop-shadow(0 0 20px rgba(201,168,76,.2));animation:breathe 5s ease-in-out infinite">&#128301;</div>
+    <h1 class="gothic" style="font-size:clamp(46px,13vw,78px);color:#e0c878;letter-spacing:4px;margin-bottom:6px;text-shadow:0 2px 30px rgba(201,168,76,.35),0 0 60px rgba(201,168,76,.15)">Lunalva</h1>
+    <p class="gothic" style="font-size:clamp(18px,5vw,26px);color:rgba(224,200,120,.9);letter-spacing:5px;font-style:italic">Tarot Sagrado</p>
+    <div class="divider" style="margin-top:24px">
+      <div class="divider-line"></div>
+      <svg width="20" height="20" viewBox="0 0 20 20" style="opacity:.5"><path d="M10 0L12 8L20 10L12 12L10 20L8 12L0 10L8 8Z" fill="#c9a84c"/></svg>
+      <div class="divider-line-r"></div>
     </div>
   </div>
 
-  <a href="arcana.html" class="card" style="animation-delay:0s">
-    <div class="card-line-top"></div>
-    <div class="card-line-bot"></div>
-    <div class="card-line-l"></div>
-    <div class="card-line-r"></div>
+  <!-- Card: Arcana -->
+  <a href="arcana.html" class="card" style="animation:fadeUp .7s ease .1s both">
+    <div class="corner corner-tl"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="#c9a84c" stroke-width="1"/></svg></div>
+    <div class="corner corner-tr"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="#c9a84c" stroke-width="1"/></svg></div>
+    <div class="corner corner-bl"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="#c9a84c" stroke-width="1"/></svg></div>
+    <div class="corner corner-br"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="#c9a84c" stroke-width="1"/></svg></div>
     <div style="text-align:center">
-      <div style="font-size:clamp(42px,11vw,58px);margin-bottom:14px;animation:fl 3.5s ease-in-out infinite">&#128302;</div>
-      <div class="gothic" style="font-size:clamp(30px,8vw,42px);color:#e0c878;letter-spacing:4px;margin-bottom:10px;text-shadow:0 0 30px rgba(201,168,76,.5)">Lunalva Arcana</div>
-      <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.6),transparent);margin:12px auto"></div>
-      <p class="cinzel" style="font-size:clamp(12px,3vw,15px);letter-spacing:3px;color:rgba(201,168,76,.7);margin-bottom:12px">LEITURA DE TAROT COM IA</p>
-      <p style="font-size:clamp(17px,4.2vw,20px);color:rgba(225,205,160,.92);line-height:1.8;font-style:italic">Leituras completas com 14 jogos, 78 arcanos, comando de voz e mensagem para o WhatsApp da cliente.</p>
-      <div style="margin-top:16px;display:inline-flex;align-items:center;gap:8px;padding:7px 18px;border-radius:22px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.1)">
-        <span style="font-size:14px">&#127908;</span>
-        <span class="cinzel" style="font-size:clamp(10px,2.5vw,12px);letter-spacing:2px;color:rgba(201,168,76,.75)">VOZ + IA + WHATSAPP</span>
+      <div style="font-size:clamp(38px,10vw,52px);margin-bottom:16px;animation:float 4s ease-in-out infinite;filter:drop-shadow(0 4px 12px rgba(201,168,76,.2))">&#128302;</div>
+      <div class="gothic" style="font-size:clamp(30px,8vw,44px);color:#e0c878;letter-spacing:3px;margin-bottom:6px;text-shadow:0 2px 20px rgba(201,168,76,.25)">Lunalva Arcana</div>
+      <div class="divider" style="margin:14px auto;max-width:200px">
+        <div class="divider-line"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:.6"></div>
+        <div class="divider-line-r"></div>
+      </div>
+      <p class="cinzel" style="font-size:clamp(11px,2.8vw,13px);letter-spacing:4px;color:rgba(212,184,92,.82);margin-bottom:14px">LEITURA DE TAROT COM IA</p>
+      <p style="font-size:clamp(16px,4vw,19px);color:rgba(235,215,175,1);line-height:1.85;font-style:italic;max-width:380px;margin:0 auto">Leituras completas com 14 jogos, 78 arcanos, comando de voz e mensagem para o WhatsApp da cliente.</p>
+      <div class="badge">
+        <span style="font-size:13px">&#127908;</span>
+        <span class="cinzel" style="font-size:clamp(11px,2.5vw,13px);letter-spacing:3px;color:rgba(212,184,92,.85)">VOZ + IA + WHATSAPP</span>
       </div>
     </div>
   </a>
 
-  <a href="estudo.html" class="card" style="animation-delay:.15s">
-    <div class="card-line-top"></div>
-    <div class="card-line-bot"></div>
-    <div class="card-line-l"></div>
-    <div class="card-line-r"></div>
+  <!-- Card: Estudo -->
+  <a href="estudo.html" class="card" style="animation:fadeUp .7s ease .25s both">
+    <div class="corner corner-tl"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="#c9a84c" stroke-width="1"/></svg></div>
+    <div class="corner corner-tr"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="#c9a84c" stroke-width="1"/></svg></div>
+    <div class="corner corner-bl"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="#c9a84c" stroke-width="1"/></svg></div>
+    <div class="corner corner-br"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="#c9a84c" stroke-width="1"/></svg></div>
     <div style="text-align:center">
-      <div style="font-size:clamp(42px,11vw,58px);margin-bottom:14px;animation:fl 3.5s ease-in-out infinite">&#127769;</div>
-      <div class="gothic" style="font-size:clamp(30px,8vw,42px);color:#e0c878;letter-spacing:4px;margin-bottom:10px;text-shadow:0 0 30px rgba(201,168,76,.5)">Lunalva Estudo</div>
-      <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.6),transparent);margin:12px auto"></div>
-      <p class="cinzel" style="font-size:clamp(12px,3vw,15px);letter-spacing:3px;color:rgba(201,168,76,.7);margin-bottom:12px">ESCOLA DO ARCANO</p>
-      <p style="font-size:clamp(17px,4.2vw,20px);color:rgba(225,205,160,.92);line-height:1.8;font-style:italic">Fundamentos sagrados, estudo dos 78 arcanos e exercicios de intuicao com feedback da IA.</p>
-      <div style="margin-top:16px;display:inline-flex;align-items:center;gap:8px;padding:7px 18px;border-radius:22px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.1)">
-        <span style="font-size:14px">&#128218;</span>
-        <span class="cinzel" style="font-size:clamp(10px,2.5vw,12px);letter-spacing:2px;color:rgba(201,168,76,.75)">ESTUDO + INTUICAO + IA</span>
+      <div style="font-size:clamp(38px,10vw,52px);margin-bottom:16px;animation:float 4s ease-in-out infinite .5s;filter:drop-shadow(0 4px 12px rgba(201,168,76,.2))">&#127769;</div>
+      <div class="gothic" style="font-size:clamp(30px,8vw,44px);color:#e0c878;letter-spacing:3px;margin-bottom:6px;text-shadow:0 2px 20px rgba(201,168,76,.25)">Lunalva Estudo</div>
+      <div class="divider" style="margin:14px auto;max-width:200px">
+        <div class="divider-line"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:.6"></div>
+        <div class="divider-line-r"></div>
+      </div>
+      <p class="cinzel" style="font-size:clamp(11px,2.8vw,13px);letter-spacing:4px;color:rgba(212,184,92,.82);margin-bottom:14px">ESCOLA DO ARCANO</p>
+      <p style="font-size:clamp(16px,4vw,19px);color:rgba(235,215,175,1);line-height:1.85;font-style:italic;max-width:380px;margin:0 auto">Fundamentos sagrados, estudo dos 78 arcanos e exercicios de intuicao com feedback da IA.</p>
+      <div class="badge">
+        <span style="font-size:13px">&#128218;</span>
+        <span class="cinzel" style="font-size:clamp(11px,2.5vw,13px);letter-spacing:3px;color:rgba(212,184,92,.85)">ESTUDO + INTUICAO + IA</span>
       </div>
     </div>
   </a>
 
   <!-- CTA WhatsApp -->
-  <a href="https://wa.me/553192048022?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20uma%20leitura%20de%20tarot%20%E2%9C%A8" target="_blank" rel="noopener" class="card" style="animation-delay:.3s;border-color:rgba(60,160,60,.35);max-width:480px">
-    <div class="card-line-top" style="background:linear-gradient(90deg,transparent,rgba(60,160,60,.55),rgba(100,200,80,.75),rgba(60,160,60,.55),transparent)"></div>
-    <div class="card-line-bot" style="background:linear-gradient(90deg,transparent,rgba(60,160,60,.35),transparent)"></div>
-    <div class="card-line-l" style="background:linear-gradient(180deg,transparent,rgba(60,160,60,.35),rgba(60,160,60,.55),rgba(60,160,60,.35),transparent)"></div>
-    <div class="card-line-r" style="background:linear-gradient(180deg,transparent,rgba(60,160,60,.35),rgba(60,160,60,.55),rgba(60,160,60,.35),transparent)"></div>
+  <a href="https://wa.me/553192048022?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20uma%20leitura%20de%20tarot%20%E2%9C%A8" target="_blank" rel="noopener" class="card card-wpp" style="animation:fadeUp .7s ease .4s both">
+    <div class="corner corner-tl"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="rgba(100,180,100,.5)" stroke-width="1"/></svg></div>
+    <div class="corner corner-tr"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="rgba(100,180,100,.5)" stroke-width="1"/></svg></div>
+    <div class="corner corner-bl"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="rgba(100,180,100,.5)" stroke-width="1"/></svg></div>
+    <div class="corner corner-br"><svg viewBox="0 0 20 20"><path d="M0,18 L0,0 L18,0" fill="none" stroke="rgba(100,180,100,.5)" stroke-width="1"/></svg></div>
     <div style="text-align:center">
-      <div style="font-size:clamp(38px,10vw,52px);margin-bottom:12px">&#128172;</div>
-      <div class="cinzel" style="font-size:clamp(15px,3.5vw,19px);letter-spacing:3px;color:rgba(100,220,100,.92);margin-bottom:10px">AGENDAR LEITURA</div>
-      <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,rgba(60,160,60,.45),transparent);margin:10px auto"></div>
-      <p style="font-size:clamp(17px,4.2vw,20px);color:rgba(225,205,160,.92);line-height:1.8;font-style:italic">Quer uma leitura pessoal? Fale comigo pelo WhatsApp e marque seu horario.</p>
-      <div style="margin-top:16px;display:inline-flex;align-items:center;gap:10px;padding:10px 24px;border-radius:26px;border:1px solid rgba(60,160,60,.4);background:rgba(60,160,60,.12)">
-        <span style="font-size:20px">&#128242;</span>
-        <span class="cinzel" style="font-size:clamp(12px,3vw,15px);letter-spacing:2px;color:rgba(100,220,100,.85)">WHATSAPP</span>
+      <div style="font-size:clamp(34px,9vw,46px);margin-bottom:14px">&#128172;</div>
+      <div class="cinzel" style="font-size:clamp(14px,3.5vw,18px);letter-spacing:4px;color:rgba(120,210,120,.85);margin-bottom:10px">AGENDAR LEITURA</div>
+      <div class="divider" style="margin:12px auto;max-width:140px">
+        <div class="divider-line" style="background:linear-gradient(90deg,transparent,rgba(80,160,80,.3))"></div>
+        <div style="width:3px;height:3px;border-radius:50%;background:rgba(100,180,100,.5)"></div>
+        <div class="divider-line-r" style="background:linear-gradient(90deg,rgba(80,160,80,.3),transparent)"></div>
+      </div>
+      <p style="font-size:clamp(16px,4vw,19px);color:rgba(235,215,175,1);line-height:1.85;font-style:italic;max-width:360px;margin:0 auto">Quer uma leitura pessoal? Fale comigo pelo WhatsApp e marque seu horario.</p>
+      <div class="badge badge-wpp">
+        <span style="font-size:18px">&#128242;</span>
+        <span class="cinzel" style="font-size:clamp(10px,2.5vw,13px);letter-spacing:3px;color:rgba(140,220,140,.9)">WHATSAPP</span>
       </div>
     </div>
   </a>
 
-  <div style="text-align:center;margin-top:24px;animation:fu .8s ease">
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px">
-      <div style="flex:1;max-width:80px;height:1px;background:linear-gradient(90deg,transparent,#7a6230)"></div>
-      <div style="color:rgba(201,168,76,.55);font-size:18px">&#10022;</div>
-      <div style="flex:1;max-width:80px;height:1px;background:linear-gradient(90deg,#7a6230,transparent)"></div>
+  <!-- Footer -->
+  <div style="text-align:center;margin-top:28px;animation:fadeUp .8s ease .5s both">
+    <div class="divider">
+      <div class="divider-line" style="max-width:60px"></div>
+      <svg width="16" height="16" viewBox="0 0 20 20" style="opacity:.35"><path d="M10 0L12 8L20 10L12 12L10 20L8 12L0 10L8 8Z" fill="#c9a84c"/></svg>
+      <div class="divider-line-r" style="max-width:60px"></div>
     </div>
-    <p class="cinzel" style="font-size:clamp(9px,2.2vw,11px);letter-spacing:4px;color:rgba(201,168,76,.5)">LUNALVA TAROT SAGRADO</p>
+    <p class="cinzel" style="font-size:clamp(10px,2.5vw,12px);letter-spacing:5px;color:rgba(212,184,92,.7);margin-top:8px">LUNALVA TAROT SAGRADO</p>
   </div>
 
 </div>
 
 <script>
-// Stars
 const c=document.getElementById('stars');
-for(let i=0;i<150;i++){
+for(let i=0;i<120;i++){
   const s=document.createElement('div');
   s.className='star';
-  const sz=.3+((i*31)%20)/11;
-  s.style.cssText=`left:${(i*137.5)%100}%;top:${(i*97.3)%100}%;width:${sz}px;height:${sz}px;background:${sz>1.5?'#c9a84c':'rgba(240,210,150,.6)'};animation:tw ${2.5+(i*17)%5}s ${(i*43)%6}s ease-in-out infinite alternate`;
+  const sz=.2+((i*31)%18)/13;
+  const delay=(i*43)%8;
+  const dur=3+(i*17)%6;
+  s.style.cssText=`left:${(i*137.5)%100}%;top:${(i*97.3)%100}%;width:${sz}px;height:${sz}px;background:${sz>1.3?'rgba(201,168,76,.7)':'rgba(230,210,170,.4)'};animation:shimmer ${dur}s ${delay}s ease-in-out infinite;border-radius:50%`;
   c.appendChild(s);
 }
 </script>

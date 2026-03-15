@@ -10,21 +10,26 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#060503;min-height:100vh;overflow-x:hidden}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:2px}
+body{background:#08060a;min-height:100vh;overflow-x:hidden;color:#e8dcc8}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 50% at 50% 30%,rgba(140,50,50,.04),transparent 70%),
+  radial-gradient(ellipse 60% 40% at 80% 70%,rgba(201,168,76,.03),transparent 60%)}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5c5 8 15 12 25 12-5 8-8 18-5 28-8-3-18-3-25 2-7-5-17-5-25-2 3-10 0-20-5-28 10 0 20-4 25-12z' fill='none' stroke='%23c9a84c' stroke-width='.5' opacity='.4'/%3E%3C/svg%3E")}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:4px}
 .gothic{font-family:'UnifrakturMaguntia',cursive}
 .cinzel{font-family:'Cinzel',serif}
 .garamond{font-family:'EB Garamond',serif}
 button{cursor:pointer}
 textarea,input{font-family:'EB Garamond',serif}
 @keyframes tw{from{opacity:.03;transform:scale(.4)}to{opacity:.65;transform:scale(1.6)}}
-@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes sp{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes sh{0%,100%{opacity:.2}60%{opacity:.85}}
-@keyframes gl{0%,100%{box-shadow:0 0 15px rgba(201,168,76,.15)}50%{box-shadow:0 0 40px rgba(201,168,76,.4)}}
-@keyframes eyePulse{0%,100%{opacity:.5}50%{opacity:.9}}
+@keyframes sh{0%,100%{opacity:.3}60%{opacity:1}}
+@keyframes gl{0%,100%{box-shadow:0 4px 20px rgba(0,0,0,.3),0 0 15px rgba(201,168,76,.08)}50%{box-shadow:0 4px 20px rgba(0,0,0,.3),0 0 35px rgba(201,168,76,.2)}}
+@keyframes eyePulse{0%,100%{opacity:.55}50%{opacity:.95}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 </style>
 </head>
@@ -37,11 +42,11 @@ const{useState,useEffect,useRef,useCallback}=React;
 const E={
   bg:"#060503",panel:"#0c0a06",
   purple:"#c9a84c",purpleBr:"#d4b85c",purplePale:"#e0c878",
-  purpleDim:"rgba(201,168,76,0.70)",
-  deep:"#7a6230",deepDim:"rgba(122,98,48,0.50)",
-  border:"rgba(201,168,76,0.30)",borderBr:"rgba(212,184,92,0.55)",
-  text:"rgba(225,205,160,0.95)",textDim:"rgba(190,170,120,0.65)",
-  textFaint:"rgba(180,150,90,0.45)",
+  purpleDim:"rgba(201,168,76,0.85)",
+  deep:"#9a7e3e",deepDim:"rgba(154,126,62,0.65)",
+  border:"rgba(201,168,76,0.35)",borderBr:"rgba(212,184,92,0.60)",
+  text:"rgba(235,215,175,1)",textDim:"rgba(210,190,145,0.85)",
+  textFaint:"rgba(200,175,120,0.70)",
   gold:"#c9a84c",goldBr:"#d4b85c",
 };
 
@@ -54,13 +59,13 @@ function Stars(){
 }
 
 function SideBars(){
-  const b={position:"fixed",top:0,bottom:0,width:3,zIndex:20,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`,opacity:.7};
+  const b={position:"fixed",top:"10%",bottom:"10%",width:1,zIndex:20,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`,opacity:.5};
   return <><div style={{...b,left:0}}/><div style={{...b,right:0}}/></>;
 }
 
 function Panel({children,style={}}){
   return(
-    <div style={{position:"relative",background:E.panel,border:`1px solid ${E.border}`,borderRadius:10,padding:"16px 18px",overflow:"hidden",...style}}>
+    <div style={{position:"relative",background:`linear-gradient(165deg, rgba(18,14,10,.95), ${E.panel})`,border:`1px solid ${E.border}`,borderRadius:12,padding:"18px 20px",overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.3)",...style}}>
       <div style={{position:"absolute",top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${E.purple},${E.purplePale},${E.purple},transparent)`}}/>
       <div style={{position:"absolute",bottom:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${E.deep},transparent)`}}/>
       <div style={{position:"absolute",top:0,left:0,bottom:0,width:1,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`}}/>
@@ -760,10 +765,10 @@ function DetalheEstudo({card,onClose}){
             </Panel>
             <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(80,10,10,.3)",borderColor:"rgba(160,40,40,.25)"}}>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:7}}>
-                <span style={{fontSize:16,color:"rgba(200,80,80,.55)"}}>↕</span>
-                <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:"rgba(200,80,80,.55)"}}>QUANDO APARECE INVERTIDA</div>
+                <span style={{fontSize:16,color:"rgba(230,110,110,.85)"}}>↕</span>
+                <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:"rgba(230,110,110,.85)"}}>QUANDO APARECE INVERTIDA</div>
               </div>
-              <p className="garamond" style={{color:"rgba(220,160,160,.72)",fontSize:16,fontStyle:"italic",lineHeight:1.85}}>{card.r?.g}</p>
+              <p className="garamond" style={{color:"rgba(235,185,185,.92)",fontSize:16,fontStyle:"italic",lineHeight:1.85}}>{card.r?.g}</p>
             </Panel>
           </div>
         )}
