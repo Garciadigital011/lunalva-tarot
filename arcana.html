@@ -652,7 +652,7 @@ function VoiceBtn({onVoiceResult}){
 // ═══════════════════════════════════════════════════════════════════
 //  MOTOR DE SÍNTESE DE VOZ (TTS) — fala a leitura em português
 // ═══════════════════════════════════════════════════════════════════
-const ttsRef = { current: null, speaking: false };
+const ttsRef = { current: null, speaking: false, chainStop: false };
 
 function speak(text, onEnd){
   if(!window.speechSynthesis){ onEnd&&onEnd(); return; }
@@ -686,6 +686,50 @@ function speak(text, onEnd){
 function stopSpeaking(){
   window.speechSynthesis?.cancel();
   ttsRef.speaking = false;
+  ttsRef.chainStop = true;
+}
+
+function speakChain(texts, onAllDone){
+  const queue = texts.filter(t=>t?.trim());
+  let idx = 0;
+  ttsRef.chainStop = false;
+  function next(){
+    if(ttsRef.chainStop || idx >= queue.length){ onAllDone?.(); return; }
+    speak(queue[idx], ()=>{ idx++; next(); });
+  }
+  next();
+}
+
+function SpeakBtnChain({texts, label}){
+  const[speaking,setSpeaking]=useState(false);
+  function toggle(){
+    if(speaking){ stopSpeaking(); setSpeaking(false); }
+    else{ speakChain(texts,()=>setSpeaking(false)); setSpeaking(true); }
+  }
+  useEffect(()=>()=>stopSpeaking(),[]);
+  return(
+    <button onClick={toggle} style={{display:"flex",alignItems:"center",gap:9,padding:"12px 22px",borderRadius:24,border:`1px solid ${speaking?"rgba(201,168,76,.6)":"rgba(201,168,76,.35)"}`,background:speaking?"rgba(138,116,72,.2)":"rgba(201,168,76,.08)",color:speaking?C.goldPale:C.gold,fontFamily:"'Cinzel',serif",fontSize:13,letterSpacing:3,cursor:"pointer",transition:"all .3s",boxShadow:speaking?"0 0 20px rgba(201,168,76,.15)":"none"}}>
+      {speaking
+        ?<><span style={{fontSize:20,animation:"sh 1s ease-in-out infinite"}}>◉</span> {label||"PAUSAR NARRAÇÃO"}</>
+        :<><span style={{fontSize:18}}>🔊</span> {label||"NARRAR TUDO"}</>}
+    </button>
+  );
+}
+
+function buildCardNarrationArcana(card){
+  const parts = [];
+  parts.push(`${card.name}.`);
+  if(card.num) parts.push(`Arcano ${card.num}.`);
+  parts.push(`Elemento: ${card.el}. Energia: ${card.move?"Movimento":"Estase"}.`);
+  if(card.planet) parts.push(`Astro regente: ${card.planet}.`);
+  parts.push(`Essência: ${card.essence}`);
+  if(card.kw) parts.push(`Palavras-chave: ${card.kw.replace(/·/g,",")}.`);
+  if(card.d?.g) parts.push(`Significado direto geral: ${card.d.g}`);
+  if(card.r?.g) parts.push(`Significado invertido geral: ${card.r.g}`);
+  if(card.d?.a) parts.push(`No amor: ${card.d.a}`);
+  if(card.d?.t) parts.push(`No trabalho: ${card.d.t}`);
+  if(card.d?.e) parts.push(`Na espiritualidade: ${card.d.e}`);
+  return parts;
 }
 
 // Botão de falar/parar inline na leitura
@@ -745,8 +789,9 @@ function ResultBox({text,loading,title,resumo,loadingResumo,situacao,tema}){
         ):(
           <>
             <div className="garamond" style={{color:C.text,lineHeight:2.05,fontSize:17,fontStyle:"italic",whiteSpace:"pre-line",letterSpacing:.3}}>{text}</div>
-            <div style={{display:"flex",justifyContent:"center",marginTop:18}}>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10,marginTop:18}}>
               <SpeakBtn text={text}/>
+              {(resumo||msgCliente)&&<SpeakBtnChain texts={[text,resumo,msgCliente].filter(Boolean)} label="NARRAR LEITURA COMPLETA"/>}
             </div>
           </>
         )}
@@ -924,6 +969,11 @@ function Detail({card,onClose}){
       <div style={{maxWidth:500,margin:"0 auto",animation:"fu .4s ease"}}>
         <CardBig card={card}/>
 
+        {/* Botão master NARRAR CARTA */}
+        <div style={{display:"flex",justifyContent:"center",marginTop:12}}>
+          <SpeakBtnChain texts={buildCardNarrationArcana(card)} label="NARRAR CARTA"/>
+        </div>
+
         {/* ── ATRIBUTOS SAGRADOS ── */}
         <Panel style={{marginTop:10,padding:"14px 16px",background:"rgba(10,8,3,.95)"}}>
           <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:C.goldDim,marginBottom:12}}>ATRIBUTOS SAGRADOS</div>
@@ -984,6 +1034,9 @@ function Detail({card,onClose}){
           <div style={{marginTop:10,display:"flex",flexWrap:"wrap",gap:4}}>
             {card.kw?.split("·").map((k,i)=>(<span key={i} className="cinzel" style={{padding:"2px 8px",borderRadius:10,background:"rgba(201,168,76,.1)",border:`1px solid ${C.amberDim}`,fontSize:11,color:C.goldDim,letterSpacing:1}}>{k.trim()}</span>))}
           </div>
+          <div style={{display:"flex",justifyContent:"center",marginTop:12}}>
+            <SpeakBtn text={`${card.name}. Essência: ${card.essence}. Palavras-chave: ${card.kw?.replace(/·/g,",")}.`}/>
+          </div>
         </Panel>
         <Panel style={{marginTop:10,padding:"15px 17px",background:"rgba(80,10,10,.3)",borderColor:"rgba(160,40,40,.25)"}}>
           <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:8}}>
@@ -991,6 +1044,9 @@ function Detail({card,onClose}){
             <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:"rgba(230,110,110,.85)"}}>SIGNIFICADO INVERTIDO</div>
           </div>
           <p className="garamond" style={{color:"rgba(235,185,185,.92)",fontSize:17,fontStyle:"italic",lineHeight:1.9}}>{card.r?.g}</p>
+          <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
+            <SpeakBtn text={`Significado invertido: ${card.r?.g}`}/>
+          </div>
         </Panel>
         <div style={{marginTop:10}}>
           <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:10}}>

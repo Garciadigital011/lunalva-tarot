@@ -58,6 +58,110 @@ function Stars(){
   </div>;
 }
 
+// ═══════════════════════════════════════════════════════════════════
+//  SISTEMA DE ÁUDIO — TTS (Text-to-Speech) — A Alma do Negócio
+// ═══════════════════════════════════════════════════════════════════
+const ttsRef = { current: null, speaking: false, chainStop: false };
+
+function speak(text, onEnd){
+  if(!window.speechSynthesis){ onEnd&&onEnd(); return; }
+  window.speechSynthesis.cancel();
+  const clean = text
+    .replace(/[#*_~`]/g,"")
+    .replace(/\n{2,}/g,". ")
+    .replace(/\n/g," ")
+    .replace(/✦/g,"")
+    .replace(/—/g,",")
+    .slice(0,4000);
+  const utt = new SpeechSynthesisUtterance(clean);
+  utt.lang = "pt-BR";
+  utt.rate = 0.88;
+  utt.pitch = 0.92;
+  utt.volume = 1;
+  const voices = window.speechSynthesis.getVoices();
+  const ptVoice = voices.find(v=>v.lang.startsWith("pt")&&v.name.toLowerCase().includes("female"))
+    || voices.find(v=>v.lang.startsWith("pt-BR"))
+    || voices.find(v=>v.lang.startsWith("pt"));
+  if(ptVoice) utt.voice = ptVoice;
+  utt.onend = ()=>{ ttsRef.speaking=false; onEnd&&onEnd(); };
+  utt.onerror = ()=>{ ttsRef.speaking=false; onEnd&&onEnd(); };
+  ttsRef.current = utt;
+  ttsRef.speaking = true;
+  window.speechSynthesis.speak(utt);
+}
+
+function stopSpeaking(){
+  window.speechSynthesis?.cancel();
+  ttsRef.speaking = false;
+  ttsRef.chainStop = true;
+}
+
+function speakChain(texts, onAllDone){
+  const queue = texts.filter(t=>t?.trim());
+  let idx = 0;
+  ttsRef.chainStop = false;
+  function next(){
+    if(ttsRef.chainStop || idx >= queue.length){ onAllDone?.(); return; }
+    speak(queue[idx], ()=>{ idx++; next(); });
+  }
+  next();
+}
+
+function SpeakBtn({text, label}){
+  const[speaking,setSpeaking]=useState(false);
+  function toggle(){
+    if(speaking){ stopSpeaking(); setSpeaking(false); }
+    else{ speak(text,()=>setSpeaking(false)); setSpeaking(true); }
+  }
+  useEffect(()=>()=>stopSpeaking(),[]);
+  return(
+    <button onClick={toggle} style={{display:"flex",alignItems:"center",gap:7,padding:"8px 16px",borderRadius:20,border:`1px solid ${speaking?"rgba(160,120,60,.7)":E.border}`,background:speaking?"rgba(138,116,72,.15)":"rgba(201,168,76,.1)",color:speaking?E.purplePale:E.textDim,fontFamily:"'Cinzel',serif",fontSize:12,letterSpacing:2,cursor:"pointer",transition:"all .3s"}}>
+      {speaking
+        ?<><span style={{fontSize:17,animation:"sh 1s ease-in-out infinite"}}>◉</span> {label||"PAUSAR VOZ"}</>
+        :<><span style={{fontSize:15}}>▶</span> {label||"OUVIR"}</>}
+    </button>
+  );
+}
+
+function SpeakBtnChain({texts, label}){
+  const[speaking,setSpeaking]=useState(false);
+  function toggle(){
+    if(speaking){ stopSpeaking(); setSpeaking(false); }
+    else{ speakChain(texts,()=>setSpeaking(false)); setSpeaking(true); }
+  }
+  useEffect(()=>()=>stopSpeaking(),[]);
+  return(
+    <button onClick={toggle} style={{display:"flex",alignItems:"center",gap:9,padding:"12px 22px",borderRadius:24,border:`1px solid ${speaking?"rgba(201,168,76,.6)":"rgba(201,168,76,.35)"}`,background:speaking?"rgba(138,116,72,.2)":"rgba(201,168,76,.08)",color:speaking?E.purplePale:E.purple,fontFamily:"'Cinzel',serif",fontSize:13,letterSpacing:3,cursor:"pointer",transition:"all .3s",boxShadow:speaking?"0 0 20px rgba(201,168,76,.15)":"none"}}>
+      {speaking
+        ?<><span style={{fontSize:20,animation:"sh 1s ease-in-out infinite"}}>◉</span> {label||"PAUSAR NARRAÇÃO"}</>
+        :<><span style={{fontSize:18}}>🔊</span> {label||"NARRAR CARTA COMPLETA"}</>}
+    </button>
+  );
+}
+
+function buildCardNarration(card){
+  const parts = [];
+  parts.push(`${card.name}.`);
+  if(card.num) parts.push(`Arcano número ${card.num}.`);
+  parts.push(`Elemento: ${card.el}. Energia: ${card.move?"Movimento":"Estase"}.`);
+  if(card.planet) parts.push(`Astro regente: ${card.planet}.`);
+  parts.push(`Essência: ${card.essence}`);
+  if(card.kw) parts.push(`Palavras-chave: ${card.kw.replace(/·/g,",")}.`);
+  if(card.simbolismo) parts.push(`Simbologia: ${card.simbolismo}`);
+  if(card.numerologia) parts.push(`Numerologia: ${card.numerologia}`);
+  if(card.ensinamento) parts.push(`Ensinamento central: ${card.ensinamento}`);
+  if(card.d?.g) parts.push(`Significado direto geral: ${card.d.g}`);
+  if(card.r?.g) parts.push(`Significado invertido geral: ${card.r.g}`);
+  if(card.d?.a) parts.push(`No amor, direto: ${card.d.a}`);
+  if(card.r?.a) parts.push(`No amor, invertido: ${card.r.a}`);
+  if(card.d?.t) parts.push(`No trabalho, direto: ${card.d.t}`);
+  if(card.r?.t) parts.push(`No trabalho, invertido: ${card.r.t}`);
+  if(card.d?.e) parts.push(`Na espiritualidade, direto: ${card.d.e}`);
+  if(card.r?.e) parts.push(`Na espiritualidade, invertido: ${card.r.e}`);
+  if(card.cores) parts.push(`Cores e simbologia visual: ${card.cores}`);
+  return parts;
+}
+
 function SideBars(){
   const b={position:"fixed",top:"10%",bottom:"10%",width:1,zIndex:20,background:`linear-gradient(180deg,transparent,${E.deep},${E.purple},${E.deep},transparent)`,opacity:.5};
   return <><div style={{...b,left:0}}/><div style={{...b,right:0}}/></>;
@@ -465,6 +569,9 @@ function FundamentoDetalhe({f,onClose}){
         </div>
         <Panel style={{padding:"20px 18px"}}>
           <div className="garamond" style={{color:E.text,fontSize:18,lineHeight:2.1,whiteSpace:"pre-line"}}>{f.conteudo}</div>
+          <div style={{display:"flex",justifyContent:"center",marginTop:16}}>
+            <SpeakBtn text={f.conteudo} label="OUVIR ENSINAMENTO"/>
+          </div>
         </Panel>
         <div style={{textAlign:"center",marginTop:16}}>
           <button onClick={onClose} className="cinzel" style={{background:"transparent",border:`1px solid ${E.border}`,borderRadius:8,padding:"9px 24px",color:E.textDim,fontSize:13,letterSpacing:3,cursor:"pointer"}}>VOLTAR</button>
@@ -674,6 +781,11 @@ function DetalheEstudo({card,onClose}){
           </div>
         </div>
 
+        {/* Botão master NARRAR CARTA COMPLETA */}
+        <div style={{display:"flex",justifyContent:"center",marginTop:14}}>
+          <SpeakBtnChain texts={buildCardNarration(card)} label="NARRAR CARTA COMPLETA"/>
+        </div>
+
         {/* Abas */}
         <div style={{display:"flex",gap:0,marginTop:10,borderRadius:8,overflow:"hidden",border:`1px solid ${E.border}`}}>
           {[["info","📖 Estudo"],["intuicao","👁 Intuição"]].map(([k,l])=>(
@@ -691,6 +803,9 @@ function DetalheEstudo({card,onClose}){
               <p className="garamond" style={{color:E.text,fontSize:17,fontStyle:"italic",lineHeight:1.9}}>{card.essence}</p>
               <div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:4}}>
                 {card.kw?.split("·").map((k,i)=><span key={i} className="cinzel" style={{padding:"2px 7px",borderRadius:10,background:"rgba(123,95,160,.06)",border:`1px solid ${E.deepDim}`,fontSize:11,color:E.purpleDim,letterSpacing:1}}>{k.trim()}</span>)}
+              </div>
+              <div style={{display:"flex",justifyContent:"center",marginTop:12}}>
+                <SpeakBtn text={`${card.name}. Essência: ${card.essence}. Palavras-chave: ${card.kw?.replace(/·/g,",")}.`} label="OUVIR ESSÊNCIA"/>
               </div>
             </Panel>
 
@@ -735,18 +850,27 @@ function DetalheEstudo({card,onClose}){
               <Panel style={{marginTop:8,padding:"14px 16px"}}>
                 <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleDim,marginBottom:7}}>SIMBOLISMO</div>
                 <p className="garamond" style={{color:E.text,fontSize:16,lineHeight:1.9}}>{card.simbolismo}</p>
+                <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
+                  <SpeakBtn text={`Simbologia de ${card.name}. ${card.simbolismo}`} label="OUVIR SIMBOLOGIA"/>
+                </div>
               </Panel>
             )}
             {card.type==="maior"&&card.ensinamento&&(
               <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(60,40,80,.2)",borderColor:"rgba(123,95,160,.3)"}}>
                 <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleBr,marginBottom:7}}>✦ ENSINAMENTO CENTRAL</div>
                 <p className="garamond" style={{color:E.purplePale,fontSize:17,fontStyle:"italic",lineHeight:1.9}}>{card.ensinamento}</p>
+                <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
+                  <SpeakBtn text={`Ensinamento central: ${card.ensinamento}`} label="OUVIR ENSINAMENTO"/>
+                </div>
               </Panel>
             )}
             {card.type==="menor"&&card.ensinamento&&(
               <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(60,40,80,.2)",borderColor:"rgba(123,95,160,.3)"}}>
                 <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleBr,marginBottom:7}}>✦ ENSINAMENTO DO NAIPE</div>
                 <p className="garamond" style={{color:E.purplePale,fontSize:17,fontStyle:"italic",lineHeight:1.9}}>{card.ensinamento}</p>
+                <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
+                  <SpeakBtn text={`Ensinamento do naipe: ${card.ensinamento}`} label="OUVIR ENSINAMENTO"/>
+                </div>
               </Panel>
             )}
 
@@ -762,6 +886,9 @@ function DetalheEstudo({card,onClose}){
             <Panel style={{marginTop:8,padding:"14px 16px"}}>
               <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:E.purpleDim,marginBottom:8}}>QUANDO APARECE DIRETA</div>
               <p className="garamond" style={{color:E.text,fontSize:16,lineHeight:1.85}}>{card.d?.g}</p>
+              <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
+                <SpeakBtn text={`Significado direto de ${card.name}: ${card.d?.g}`} label="OUVIR DIRETO"/>
+              </div>
             </Panel>
             <Panel style={{marginTop:8,padding:"14px 16px",background:"rgba(80,10,10,.3)",borderColor:"rgba(160,40,40,.25)"}}>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:7}}>
@@ -769,6 +896,9 @@ function DetalheEstudo({card,onClose}){
                 <div className="cinzel" style={{fontSize:11,letterSpacing:4,color:"rgba(230,110,110,.85)"}}>QUANDO APARECE INVERTIDA</div>
               </div>
               <p className="garamond" style={{color:"rgba(235,185,185,.92)",fontSize:16,fontStyle:"italic",lineHeight:1.85}}>{card.r?.g}</p>
+              <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
+                <SpeakBtn text={`Significado invertido de ${card.name}: ${card.r?.g}`} label="OUVIR INVERTIDO"/>
+              </div>
             </Panel>
           </div>
         )}
@@ -793,7 +923,10 @@ function DetalheEstudo({card,onClose}){
 
             <Panel style={{padding:"16px 16px"}}>
               <p className="cinzel" style={{fontSize:16,color:E.purplePale,lineHeight:1.7,marginBottom:6}}>{perguntasIntuicao[perguntaAtual].p}</p>
-              <p className="garamond" style={{fontSize:15,color:E.textDim,fontStyle:"italic",marginBottom:12}}>{perguntasIntuicao[perguntaAtual].d}</p>
+              <p className="garamond" style={{fontSize:15,color:E.textDim,fontStyle:"italic",marginBottom:8}}>{perguntasIntuicao[perguntaAtual].d}</p>
+              <div style={{display:"flex",justifyContent:"center",marginBottom:10}}>
+                <SpeakBtn text={`${perguntasIntuicao[perguntaAtual].p}. ${perguntasIntuicao[perguntaAtual].d}`} label="OUVIR PERGUNTA"/>
+              </div>
               <textarea value={resp} onChange={e=>setResp(e.target.value)} placeholder="Escreva sua resposta aqui…" rows={4}
                 style={{width:"100%",background:"rgba(8,5,15,.8)",border:`1px solid ${E.deepDim}`,borderRadius:8,padding:"10px 12px",color:E.text,fontSize:17,outline:"none",resize:"vertical",lineHeight:1.7}}/>
               <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
@@ -808,6 +941,9 @@ function DetalheEstudo({card,onClose}){
               <Panel style={{marginTop:10,padding:"15px 16px",background:"rgba(40,30,60,.3)",borderColor:"rgba(123,95,160,.35)"}}>
                 <div className="cinzel" style={{fontSize:11,letterSpacing:3,color:E.purpleBr,marginBottom:8}}>✦ FEEDBACK</div>
                 <div className="garamond" style={{color:E.text,fontSize:17,lineHeight:2,whiteSpace:"pre-line"}}>{feedbackIA}</div>
+                <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
+                  <SpeakBtn text={feedbackIA} label="OUVIR FEEDBACK"/>
+                </div>
                 {perguntaAtual<perguntasIntuicao.length-1&&(
                   <div style={{textAlign:"center",marginTop:12}}>
                     <button onClick={proximaPergunta} className="cinzel" style={{padding:"9px 20px",borderRadius:8,border:`1px solid ${E.border}`,background:"transparent",color:E.textDim,fontSize:12,letterSpacing:2,cursor:"pointer"}}>PRÓXIMA PERGUNTA ›</button>
